@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import axios from "axios";   // ✅ Import axios
-import { useNavigate } from "react-router-dom"; // ✅ For redirect
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "./../style.css";
 
 function CreateEvent() {
   const [step, setStep] = useState(1);
-  const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -26,13 +24,14 @@ function CreateEvent() {
   });
 
   const [showPreview, setShowPreview] = useState(false);
+  const navigate = useNavigate();
 
   // Handle Input Changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setFormData({
       ...formData,
-      [name]: files ? files[0] : value,
+      [name]: files ? URL.createObjectURL(files[0]) : value, // temporary preview for images
     });
   };
 
@@ -40,16 +39,16 @@ function CreateEvent() {
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
 
-  // ✅ Submit to backend
-  const handlePublish = async () => {
-    try {
-      const res = await axios.post("/api/events", {
+  // ✅ Submit event to backend
+  const handlePublish = () => {
+    axios
+      .post("/api/events", {
         title: formData.title,
         description: formData.description,
         category: formData.category,
-        tags: formData.tags,
-        image: formData.image, // Later we can add file upload
-        date: formData.startDate,
+        tags: formData.tags.split(","),
+        image: formData.image,
+        date: formData.startDate, // simplified, could merge start+end
         location: {
           venue: formData.venueName,
           address: formData.address,
@@ -63,14 +62,15 @@ function CreateEvent() {
             available: formData.capacity || 100,
           },
         ],
+      })
+      .then((res) => {
+        alert("✅ Event Created Successfully!");
+        navigate(`/event/${res.data._id}`); // redirect to EventDetails
+      })
+      .catch((err) => {
+        console.error("❌ Error creating event:", err);
+        alert("Error creating event");
       });
-
-      alert("✅ Event Created Successfully!");
-      navigate(`/event/${res.data._id}`); // Redirect to Event Details Page
-    } catch (err) {
-      console.error("Error publishing event:", err);
-      alert("❌ Failed to publish event.");
-    }
   };
 
   return (
@@ -102,7 +102,7 @@ function CreateEvent() {
             <option value="Festival">Festival</option>
           </select>
           <input type="text" name="tags" placeholder="Tags (comma separated)" value={formData.tags} onChange={handleChange} />
-          <input type="text" name="image" placeholder="Image URL (later file upload)" value={formData.image} onChange={handleChange} />
+          <input type="file" name="image" onChange={handleChange} />
           <button className="btn-next" onClick={nextStep}>Next ➡</button>
         </div>
       )}
@@ -153,6 +153,7 @@ function CreateEvent() {
             <button className="btn-back" onClick={prevStep}>⬅ Back</button>
             <button className="btn-outline" onClick={() => setShowPreview(true)}>Preview Event</button>
             <button className="btn-outline">Save Draft</button>
+            {/* ✅ Call publish function */}
             <button className="btn-primary" onClick={handlePublish}>Publish Event</button>
           </div>
         </div>
