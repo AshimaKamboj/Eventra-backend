@@ -1,28 +1,27 @@
-// models/Event.js
+// server/models/Event.js
 const mongoose = require('mongoose');
 
-const ticketSchema = new mongoose.Schema({
-  type: { type: String, required: true },     // e.g. VIP, Gold, Silver
-  price: { type: Number, required: true },
+const TicketSchema = new mongoose.Schema({
+  type: { type: String, default: 'General' },
+  price: { type: Number, default: 0 },
   available: { type: Number, default: 0 }
 });
 
 const EventSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  description: String,
-  category: String,
-  date: Date,
+  description: { type: String, default: '' },
+  category: { type: String, default: '' },
+  image: { type: String, default: '' },         // image URL
+  date: { type: Date, default: Date.now },
   location: {
-    venue: String,
-    address: String,
-    city: String,
-    lat: Number,
-    lng: Number
+    venue: { type: String, default: '' },
+    address: { type: String, default: '' },
+    city: { type: String, default: '' },
+    country: { type: String, default: '' }
   },
-  image: String, // can store URL
-  tickets: [ticketSchema],
-  createdAt: { type: Date, default: Date.now },
-  organizerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' } // optional later
-});
+  tickets: { type: [TicketSchema], default: [] },
+  price: { type: Number, default: 0 },           // fallback price
+  createdBy: { type: String, default: 'system' } // organizer id later
+}, { timestamps: true });
 
 module.exports = mongoose.model('Event', EventSchema);

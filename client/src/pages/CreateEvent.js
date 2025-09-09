@@ -1,14 +1,18 @@
 import React, { useState } from "react";
+import axios from "axios";   // ✅ Import axios
+import { useNavigate } from "react-router-dom"; // ✅ For redirect
 import "./../style.css";
 
 function CreateEvent() {
   const [step, setStep] = useState(1);
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     category: "",
     tags: "",
-    image: null,
+    image: "",
     startDate: "",
     endDate: "",
     startTime: "",
@@ -35,6 +39,39 @@ function CreateEvent() {
   // Step Navigation
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
+
+  // ✅ Submit to backend
+  const handlePublish = async () => {
+    try {
+      const res = await axios.post("/api/events", {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        tags: formData.tags,
+        image: formData.image, // Later we can add file upload
+        date: formData.startDate,
+        location: {
+          venue: formData.venueName,
+          address: formData.address,
+          city: formData.city,
+        },
+        ticketPrice: formData.ticketPrice,
+        tickets: [
+          {
+            type: "General",
+            price: formData.ticketPrice,
+            available: formData.capacity || 100,
+          },
+        ],
+      });
+
+      alert("✅ Event Created Successfully!");
+      navigate(`/event/${res.data._id}`); // Redirect to Event Details Page
+    } catch (err) {
+      console.error("Error publishing event:", err);
+      alert("❌ Failed to publish event.");
+    }
+  };
 
   return (
     <div className="create-event">
@@ -65,7 +102,7 @@ function CreateEvent() {
             <option value="Festival">Festival</option>
           </select>
           <input type="text" name="tags" placeholder="Tags (comma separated)" value={formData.tags} onChange={handleChange} />
-          <input type="file" name="image" onChange={handleChange} />
+          <input type="text" name="image" placeholder="Image URL (later file upload)" value={formData.image} onChange={handleChange} />
           <button className="btn-next" onClick={nextStep}>Next ➡</button>
         </div>
       )}
@@ -116,7 +153,7 @@ function CreateEvent() {
             <button className="btn-back" onClick={prevStep}>⬅ Back</button>
             <button className="btn-outline" onClick={() => setShowPreview(true)}>Preview Event</button>
             <button className="btn-outline">Save Draft</button>
-            <button className="btn-primary">Publish Event</button>
+            <button className="btn-primary" onClick={handlePublish}>Publish Event</button>
           </div>
         </div>
       )}
@@ -137,7 +174,7 @@ function CreateEvent() {
             
             <div className="buttons">
               <button className="btn-back" onClick={() => setShowPreview(false)}>Close</button>
-              <button className="btn-primary">Publish Event</button>
+              <button className="btn-primary" onClick={handlePublish}>Publish Event</button>
             </div>
           </div>
         </div>

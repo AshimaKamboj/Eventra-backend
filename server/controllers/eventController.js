@@ -1,59 +1,74 @@
-// controllers/eventController.js
+// server/controllers/eventController.js
 const Event = require('../models/Event');
 
-// create event
+// Create
 exports.createEvent = async (req, res) => {
   try {
-    const data = req.body;
-    const ev = new Event(data);
-    await ev.save();
-    res.status(201).json(ev);
+    const payload = req.body;
+    // if tickets not provided, create a default ticket
+    if (!payload.tickets) {
+      payload.tickets = [{ type: 'General', price: payload.price || 0, available: 100 }];
+    }
+    const event = new Event(payload);
+    await event.save();
+    res.status(201).json(event);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(err);
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
-// get all events (with filters later)
+// Read all (with optional filters: city, category, q)
 exports.getEvents = async (req, res) => {
   try {
-    const { city, category } = req.query;
+    const { city, category, q } = req.query;
     const filter = {};
-    if (city) filter['location.city'] = city;
-    if (category) filter.category = category;
+    if (city) filter['location.city'] = new RegExp(city, 'i');
+    if (category) filter.category = new RegExp(category, 'i');
+    if (q) filter.$or = [
+      { title: new RegExp(q, 'i') },
+      { description: new RegExp(q, 'i') }
+    ];
+
     const events = await Event.find(filter).sort({ createdAt: -1 });
     res.json(events);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// get event by id
+// Read one
 exports.getEventById = async (req, res) => {
   try {
-    const ev = await Event.findById(req.params.id);
-    if (!ev) return res.status(404).json({ message: 'Event not found' });
-    res.json(ev);
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ message: 'Event not found' });
+    res.json(event);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// update
+// Update
 exports.updateEvent = async (req, res) => {
   try {
-    const ev = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(ev);
+    const event = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!event) return res.status(404).json({ message: 'Event not found' });
+    res.json(event);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// delete
+// Delete
 exports.deleteEvent = async (req, res) => {
   try {
-    await Event.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Deleted' });
+    const event = await Event.findByIdAndDelete(req.params.id);
+    if (!event) return res.status(404).json({ message: 'Event not found' });
+    res.json({ message: 'Event deleted' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+    console.error(err);
+   
+  }}
