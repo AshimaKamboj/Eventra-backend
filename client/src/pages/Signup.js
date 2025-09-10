@@ -15,7 +15,7 @@ function Signup() {
   });
 
   const navigate = useNavigate();
-  const { login } = useAuth(); // use context
+  const { login } = useAuth(); // ✅ use AuthContext
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -25,7 +25,7 @@ function Signup() {
     e.preventDefault();
 
     if (form.password !== form.confirmPassword) {
-      alert("Passwords do not match!");
+      alert("❌ Passwords do not match!");
       return;
     }
 
@@ -37,9 +37,9 @@ function Signup() {
         role: form.role,
       });
 
-      // auto login after signup
+      // ✅ Auto-login after signup
       login(res.data.token, res.data.user);
-      alert("Signup successful! Welcome 🎉");
+      alert("🎉 Signup successful! Welcome to Eventra.");
       navigate("/");
     } catch (err) {
       console.error("Signup error:", err);
@@ -89,14 +89,15 @@ function Signup() {
             required
           />
 
-          {/* Optional: Role selection */}
+          {/* ✅ Role selection */}
+          <label className="auth-label">Register as:</label>
           <select
             name="role"
             className="auth-input"
             value={form.role}
             onChange={handleChange}
           >
-            <option value="user">User</option>
+            <option value="user">Normal User</option>
             <option value="organizer">Organizer</option>
           </select>
 
