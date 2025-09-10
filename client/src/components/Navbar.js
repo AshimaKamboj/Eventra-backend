@@ -2,14 +2,15 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext"; // ✅ import auth hook
 import "./../style.css";
 
-function Navbar({ sessionUser }) {
+function Navbar() {
   const navigate = useNavigate();
+  const { auth, logout } = useAuth(); // ✅ get user + logout from context
 
   const handleLogout = () => {
-    localStorage.removeItem("user"); // optional clear
-    sessionUser.setUser(null);       // clear session
+    logout();
     navigate("/login");
   };
 
@@ -24,19 +25,22 @@ function Navbar({ sessionUser }) {
 
       <div className="nav-center">
         <Link to="/explore">Explore</Link>
-        <Link to="/create-event">Create Event</Link>
+        {/* ✅ Show Create Event only for organizers */}
+        {auth.user?.role === "organizer" && (
+          <Link to="/create-event">Create Event</Link>
+        )}
         <Link to="/venues">Venues</Link>
         <Link to="/blog">Blog</Link>
         <Link to="/support">Support</Link>
       </div>
 
       <div className="nav-right">
-        {sessionUser.user ? (
+        {auth.user ? (
           <>
             <Link to="/profile">
-              {sessionUser.user.photo && sessionUser.user.photo.trim() !== "" ? (
+              {auth.user.photo && auth.user.photo.trim() !== "" ? (
                 <img
-                  src={sessionUser.user.photo}
+                  src={auth.user.photo}
                   alt="Profile"
                   className="nav-profile-icon"
                 />
