@@ -42,18 +42,11 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Navbar /> {/* Navbar will read user from AuthContext */}
+        <Navbar /> {/* Navbar automatically shows buttons based on logged-in user */}
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/explore" element={<Explore />} />
-          <Route
-            path="/create-event"
-            element={
-              <OrganizerRoute>
-                <CreateEvent />
-              </OrganizerRoute>
-            }
-          />
           <Route path="/venues" element={<Venues />} />
           <Route path="/venues/:id" element={<VenueDetails />} />
           <Route path="/blog" element={<Blog />} />
@@ -62,12 +55,24 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/event/:id" element={<EventDetails />} />
+
+          {/* Protected Routes */}
           <Route
             path="/profile"
             element={
               <ProtectedRoute>
                 <Profile />
               </ProtectedRoute>
+            }
+          />
+
+          {/* Organizer-only Routes */}
+          <Route
+            path="/create-event"
+            element={
+              <OrganizerRoute>
+                <CreateEvent />
+              </OrganizerRoute>
             }
           />
         </Routes>
