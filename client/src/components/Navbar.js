@@ -16,6 +16,7 @@ function Navbar() {
 
   return (
     <nav className="navbar">
+      {/* Left: Logo */}
       <div className="nav-left">
         <Link to="/" className="logo-link">
           <img src="/logo.ico" alt="Eventra Logo" className="logo-img" />
@@ -23,17 +24,21 @@ function Navbar() {
         </Link>
       </div>
 
+      {/* Center: Navigation Links */}
       <div className="nav-center">
         <Link to="/explore">Explore</Link>
-        {/* ✅ Show Create Event only for organizers */}
+        
+        {/* ✅ Only organizers see Create Event */}
         {auth.user?.role === "organizer" && (
           <Link to="/create-event">Create Event</Link>
         )}
+
         <Link to="/venues">Venues</Link>
         <Link to="/blog">Blog</Link>
         <Link to="/support">Support</Link>
       </div>
 
+      {/* Right: Auth Buttons */}
       <div className="nav-right">
         {auth.user ? (
           <>
