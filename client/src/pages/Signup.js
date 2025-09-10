@@ -1,6 +1,8 @@
 // src/pages/Signup.js
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 import "./../style.css";
 
 function Signup() {
@@ -9,15 +11,17 @@ function Signup() {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "user", // default role
   });
 
   const navigate = useNavigate();
+  const { login } = useAuth(); // use context
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (form.password !== form.confirmPassword) {
@@ -25,14 +29,22 @@ function Signup() {
       return;
     }
 
-    // Save signup info to localStorage (simulate database)
-    localStorage.setItem(
-      "signupUser",
-      JSON.stringify({ name: form.name, email: form.email, password: form.password })
-    );
+    try {
+      const res = await axios.post("/api/auth/register", {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        role: form.role,
+      });
 
-    alert("Signup successful! Please login.");
-    navigate("/login");
+      // auto login after signup
+      login(res.data.token, res.data.user);
+      alert("Signup successful! Welcome 🎉");
+      navigate("/");
+    } catch (err) {
+      console.error("Signup error:", err);
+      alert("Signup failed. Try again.");
+    }
   };
 
   return (
@@ -76,7 +88,21 @@ function Signup() {
             onChange={handleChange}
             required
           />
-          <button type="submit" className="auth-btn">Sign Up</button>
+
+          {/* Optional: Role selection */}
+          <select
+            name="role"
+            className="auth-input"
+            value={form.role}
+            onChange={handleChange}
+          >
+            <option value="user">User</option>
+            <option value="organizer">Organizer</option>
+          </select>
+
+          <button type="submit" className="auth-btn">
+            Sign Up
+          </button>
         </form>
         <p className="auth-link">
           Already have an account? <Link to="/login">Login</Link>
