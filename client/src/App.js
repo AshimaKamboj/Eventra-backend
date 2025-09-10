@@ -1,5 +1,5 @@
 // src/App.js
-import React, { useState } from "react";
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -20,7 +20,11 @@ import EventDetails from "./pages/EventDetails";
 import VenueDetails from "./pages/VenueDetails";
 import BlogPost from "./pages/BlogPost";
 import Profile from "./pages/Profile";
+
+// Auth wrappers
 import ProtectedRoute from "./components/ProtectedRoute";
+import OrganizerRoute from "./components/OrganizerRoute";
+import { AuthProvider } from "./context/AuthContext";
 
 // Home Page Layout
 function Home() {
@@ -35,36 +39,41 @@ function Home() {
 }
 
 function App() {
-  // Session user state; starts null on fresh app start
-  const [user, setUser] = useState(null);
-  const sessionUser = { user, setUser }; // pass to Navbar and Login
-
   return (
-    <Router>
-      <Navbar sessionUser={sessionUser} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/explore" element={<Explore />} />
-        <Route path="/create-event" element={<CreateEvent />} />
-        <Route path="/venues" element={<Venues />} />
-        <Route path="/venues/:id" element={<VenueDetails />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:postId" element={<BlogPost />} />
-        <Route path="/support" element={<Support />} />
-        <Route path="/login" element={<Login sessionUser={sessionUser} />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/event/:id" element={<EventDetails />} />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-      <Footer />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Navbar /> {/* Navbar will read user from AuthContext */}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route
+            path="/create-event"
+            element={
+              <OrganizerRoute>
+                <CreateEvent />
+              </OrganizerRoute>
+            }
+          />
+          <Route path="/venues" element={<Venues />} />
+          <Route path="/venues/:id" element={<VenueDetails />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:postId" element={<BlogPost />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/event/:id" element={<EventDetails />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+        <Footer />
+      </Router>
+    </AuthProvider>
   );
 }
 
