@@ -85,10 +85,15 @@ function Explore() {
             <img src={event.image} alt={event.title} className="event-img" />
             <div className="event-info">
               <h3>{event.title}</h3>
-              <p>
-                📅 {event.date || new Date(event.date).toLocaleDateString()} • 📍{" "}
-                {event.location?.city || event.location}
-              </p>
+          <p>
+  📅 {event.date 
+        ? new Date(event.date).toLocaleDateString("en-US", { 
+            day: "numeric", month: "short", year: "numeric" 
+          }) 
+        : event.date} 
+   • 📍 {event.location?.city || event.location}
+</p>
+
               <Link to={`/event/${event._id || event.id}`}>
                 <button className="event-btn">View Details</button>
               </Link>
