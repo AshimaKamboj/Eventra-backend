@@ -1,17 +1,21 @@
-// src/components/OrganizerRoute.js
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function OrganizerRoute({ children }) {
-  const { user } = useAuth();
+  const { auth } = useAuth();
 
-  if (!user) {
+  // ⏳ Prevent redirect until auth is loaded
+  if (auth === null) {
+    return <h2>⏳ Checking permissions...</h2>;
+  }
+
+  if (!auth.user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (user.role !== "organizer") {
-    return <Navigate to="/" replace />; // redirect normal users
+  if (auth.user.role !== "organizer") {
+    return <Navigate to="/" replace />;
   }
 
   return children;
