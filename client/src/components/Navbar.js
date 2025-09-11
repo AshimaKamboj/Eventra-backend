@@ -2,12 +2,12 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
-import { useAuth } from "../context/AuthContext"; // ✅ import auth hook
+import { useAuth } from "../context/AuthContext"; 
 import "./../style.css";
 
 function Navbar() {
   const navigate = useNavigate();
-  const { auth, logout } = useAuth(); // ✅ get user + logout from context
+  const { auth, logout } = useAuth(); 
 
   const handleLogout = () => {
     logout();
@@ -27,9 +27,9 @@ function Navbar() {
       {/* Center: Navigation Links */}
       <div className="nav-center">
         <Link to="/explore">Explore</Link>
-        
+
         {/* ✅ Only organizers see Create Event */}
-        {auth.user?.role === "organizer" && (
+        {auth?.user?.role === "organizer" && (
           <Link to="/create-event">Create Event</Link>
         )}
 
@@ -40,7 +40,7 @@ function Navbar() {
 
       {/* Right: Auth Buttons */}
       <div className="nav-right">
-        {auth.user ? (
+        {auth?.user ? (
           <>
             <Link to="/profile">
               {auth.user.photo && auth.user.photo.trim() !== "" ? (
