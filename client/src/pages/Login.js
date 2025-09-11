@@ -22,13 +22,13 @@ function Login() {
         password: form.password,
       });
 
-      // save token + user in context & localStorage
+      // ✅ Pass token + user separately
       login(res.data.token, res.data.user);
 
       alert("✅ Login successful!");
       navigate("/");
     } catch (err) {
-      console.error("Login error:", err);
+      console.error("❌ Login error:", err);
       alert("Invalid credentials.");
     }
   };
