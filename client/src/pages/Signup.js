@@ -37,8 +37,9 @@ function Signup() {
         role: form.role,
       });
 
-      // ✅ Auto-login after signup
+      // ✅ Auto-login after signup (fix: pass token, user separately)
       login(res.data.token, res.data.user);
+
       alert("🎉 Signup successful! Welcome to Eventra.");
       navigate("/");
     } catch (err) {
