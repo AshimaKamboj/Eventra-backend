@@ -1,7 +1,8 @@
+// src/pages/CreateEvent.js
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // ✅ use auth context
+import { useAuth } from "../context/AuthContext"; // ✅ get auth
 import "./../style.css";
 
 function CreateEvent() {
@@ -26,14 +27,14 @@ function CreateEvent() {
 
   const [showPreview, setShowPreview] = useState(false);
   const navigate = useNavigate();
-  const { auth } = useAuth(); // ✅ get logged-in user & token
+  const { auth } = useAuth(); // ✅ get token from context
 
   // Handle Input Changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setFormData({
       ...formData,
-      [name]: files ? URL.createObjectURL(files[0]) : value,
+      [name]: files ? URL.createObjectURL(files[0]) : value, // local preview only
     });
   };
 
@@ -43,11 +44,6 @@ function CreateEvent() {
 
   // ✅ Submit event to backend
   const handlePublish = async () => {
-    if (!auth.user || auth.user.role !== "organizer") {
-      alert("❌ Only organizers can create events.");
-      return;
-    }
-
     try {
       const res = await axios.post(
         "/api/events",
@@ -63,7 +59,6 @@ function CreateEvent() {
             address: formData.address,
             city: formData.city,
           },
-          ticketPrice: formData.ticketPrice,
           tickets: [
             {
               type: "General",
@@ -74,16 +69,16 @@ function CreateEvent() {
         },
         {
           headers: {
-            Authorization: `Bearer ${auth.token}`, // ✅ attach JWT
+            Authorization: `Bearer ${auth.token}`, // ✅ send JWT
           },
         }
       );
 
       alert("✅ Event Created Successfully!");
-      navigate(`/event/${res.data._id}`);
+      navigate(`/event/${res.data._id}`); // redirect
     } catch (err) {
-      console.error("❌ Error creating event:", err.response?.data || err);
-      alert("Error creating event. Check console.");
+      console.error("❌ Error creating event:", err);
+      alert("Error creating event");
     }
   };
 
@@ -102,7 +97,54 @@ function CreateEvent() {
         <button className={step === 4 ? "active" : ""} onClick={() => setStep(4)}>Pricing & Tickets</button>
       </div>
 
-      {/* ... keep all your steps as before ... */}
+      {/* Step 1: Basic Info */}
+      {step === 1 && (
+        <div className="form-card">
+          <h2>📌 Basic Information</h2>
+          <input type="text" name="title" placeholder="Event Title *" value={formData.title} onChange={handleChange} />
+          <textarea name="description" placeholder="Event Description *" value={formData.description} onChange={handleChange}></textarea>
+          <select name="category" value={formData.category} onChange={handleChange}>
+            <option value="">Select Category</option>
+            <option value="Music">Music</option>
+            <option value="Conference">Conference</option>
+            <option value="Workshop">Workshop</option>
+            <option value="Festival">Festival</option>
+          </select>
+          <input type="text" name="tags" placeholder="Tags (comma separated)" value={formData.tags} onChange={handleChange} />
+          <input type="file" name="image" onChange={handleChange} />
+          <button className="btn-next" onClick={nextStep}>Next ➡</button>
+        </div>
+      )}
+
+      {/* Step 2: Event Details */}
+      {step === 2 && (
+        <div className="form-card">
+          <h2>📅 Event Schedule</h2>
+          <input type="date" name="startDate" value={formData.startDate} onChange={handleChange} />
+          <input type="time" name="startTime" value={formData.startTime} onChange={handleChange} />
+          <input type="date" name="endDate" value={formData.endDate} onChange={handleChange} />
+          <input type="time" name="endTime" value={formData.endTime} onChange={handleChange} />
+          <input type="number" name="capacity" placeholder="Expected Capacity" value={formData.capacity} onChange={handleChange} />
+          <div className="buttons">
+            <button className="btn-back" onClick={prevStep}>⬅ Back</button>
+            <button className="btn-next" onClick={nextStep}>Next ➡</button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 3: Location */}
+      {step === 3 && (
+        <div className="form-card">
+          <h2>📍 Event Location</h2>
+          <input type="text" name="venueName" placeholder="Venue Name" value={formData.venueName} onChange={handleChange} />
+          <input type="text" name="address" placeholder="Address" value={formData.address} onChange={handleChange} />
+          <input type="text" name="city" placeholder="City" value={formData.city} onChange={handleChange} />
+          <div className="buttons">
+            <button className="btn-back" onClick={prevStep}>⬅ Back</button>
+            <button className="btn-next" onClick={nextStep}>Next ➡</button>
+          </div>
+        </div>
+      )}
 
       {/* Step 4: Pricing */}
       {step === 4 && (
@@ -120,8 +162,29 @@ function CreateEvent() {
             <button className="btn-back" onClick={prevStep}>⬅ Back</button>
             <button className="btn-outline" onClick={() => setShowPreview(true)}>Preview Event</button>
             <button className="btn-outline">Save Draft</button>
-            {/* ✅ Call publish function */}
             <button className="btn-primary" onClick={handlePublish}>Publish Event</button>
+          </div>
+        </div>
+      )}
+
+      {/* Preview Modal */}
+      {showPreview && (
+        <div className="preview-modal">
+          <div className="preview-content">
+            <h2>👀 Event Preview</h2>
+            <h3>{formData.title || "Untitled Event"}</h3>
+            <p>{formData.description || "No description provided."}</p>
+            <p><strong>Category:</strong> {formData.category}</p>
+            <p><strong>Tags:</strong> {formData.tags}</p>
+            <p><strong>Schedule:</strong> {formData.startDate} {formData.startTime} - {formData.endDate} {formData.endTime}</p>
+            <p><strong>Location:</strong> {formData.venueName}, {formData.address}, {formData.city}</p>
+            <p><strong>Tickets:</strong> {formData.currency} {formData.ticketPrice}</p>
+            <p><strong>Total (incl. fee):</strong> {formData.ticketPrice ? (formData.ticketPrice * 1.02).toFixed(2) : "0"} {formData.currency}</p>
+            
+            <div className="buttons">
+              <button className="btn-back" onClick={() => setShowPreview(false)}>Close</button>
+              <button className="btn-primary" onClick={handlePublish}>Publish Event</button>
+            </div>
           </div>
         </div>
       )}
