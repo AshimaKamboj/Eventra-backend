@@ -1810,3 +1810,123 @@ body {
   cursor: pointer;
   margin-bottom: 10px;
 }
+
+.profile-page {
+  max-width: 1000px;
+  margin: auto;
+  padding: 2rem;
+  font-family: "Inter", sans-serif;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9f9ff;
+  padding: 1.5rem;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.05);
+}
+
+.profile-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+.role-badge {
+  background: #7c3aed;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+}
+
+.logout-btn {
+  background: #ff4b4b;
+  border: none;
+  padding: 8px 15px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.profile-section {
+  margin-top: 2rem;
+}
+
+.stats-grid {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+
+.stat-card {
+  flex: 1;
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.stat-card h2 {
+  font-size: 2rem;
+  margin-bottom: 0.3rem;
+}
+
+.stat-card.green { background: #34d399; }
+.stat-card.purple { background: #7c3aed; }
+.stat-card.orange { background: #f59e0b; }
+
+.booking-card,
+.event-card-small {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.05);
+}
+
+.booking-img {
+  width: 120px;
+  height: 80px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.qr-small {
+  width: 70px;
+  margin-top: 10px;
+}
+
+.small-btn {
+  background: #2563eb;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.attendee-list {
+  margin-top: 1rem;
+  background: #f3f4f6;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.attendee-card {
+  padding: 6px 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.attendee-card:last-child {
+  border-bottom: none;
+}
+

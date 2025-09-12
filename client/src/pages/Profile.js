@@ -12,14 +12,14 @@ function Profile() {
   const [bookings, setBookings] = useState([]);
   const [myEvents, setMyEvents] = useState([]);
   const [attendees, setAttendees] = useState({});
+  const [stats, setStats] = useState({ totalEvents: 0, totalAttendees: 0, revenue: 0 });
   const [loading, setLoading] = useState(true);
 
-  // redirect if not logged in
   useEffect(() => {
     if (!auth.user) navigate("/login");
   }, [auth.user, navigate]);
 
-  // fetch bookings for users
+  // Fetch bookings for users
   useEffect(() => {
     if (auth.user?.role === "user") {
       axios
@@ -34,26 +34,36 @@ function Profile() {
     }
   }, [auth]);
 
-  // fetch organizer's events
+  // Fetch organizer’s events and stats
   useEffect(() => {
     if (auth.user?.role === "organizer") {
       axios
         .get("/api/events", {
           headers: { Authorization: `Bearer ${auth.token}` },
         })
-        .then((res) => {
-          // filter events created by this organizer
-          const mine = res.data.filter(
-            (event) => event.organizer?._id === auth.user._id
-          );
+        .then(async (res) => {
+          const mine = res.data.filter((e) => e.organizer?._id === auth.user._id);
           setMyEvents(mine);
+
+          // fetch attendees for stats
+          let totalAttendees = 0;
+          let revenue = 0;
+
+          for (const event of mine) {
+            const res2 = await axios.get(`/api/bookings/event/${event._id}`, {
+              headers: { Authorization: `Bearer ${auth.token}` },
+            });
+            totalAttendees += res2.data.length;
+            revenue += res2.data.length * (event.tickets?.[0]?.price || 0);
+          }
+
+          setStats({ totalEvents: mine.length, totalAttendees, revenue });
           setLoading(false);
         })
         .catch(() => setLoading(false));
     }
   }, [auth]);
 
-  // fetch attendees for a specific event
   const fetchAttendees = async (eventId) => {
     try {
       const res = await axios.get(`/api/bookings/event/${eventId}`, {
@@ -69,6 +79,7 @@ function Profile() {
 
   return (
     <div className="profile-page">
+      {/* Header */}
       <div className="profile-header">
         <img
           src={
@@ -81,14 +92,16 @@ function Profile() {
         <div>
           <h2>{auth.user.name}</h2>
           <p>{auth.user.email}</p>
-          <p>Role: {auth.user.role}</p>
+          <span className="role-badge">
+            {auth.user.role === "organizer" ? "Event Organizer" : "Attendee"}
+          </span>
         </div>
         <button className="logout-btn" onClick={logout}>
-          Logout
+          ⎋ Logout
         </button>
       </div>
 
-      {/* Normal User Bookings */}
+      {/* User Bookings */}
       {auth.user.role === "user" && (
         <div className="profile-section">
           <h3>🎟 My Bookings</h3>
@@ -98,11 +111,7 @@ function Profile() {
             <ul className="booking-list">
               {bookings.map((b) => (
                 <li key={b._id} className="booking-card">
-                  <img
-                    src={b.event.image}
-                    alt={b.event.title}
-                    className="booking-img"
-                  />
+                  <img src={b.event.image} alt={b.event.title} className="booking-img" />
                   <div>
                     <h4>{b.event.title}</h4>
                     <p>
@@ -124,11 +133,25 @@ function Profile() {
       {/* Organizer Dashboard */}
       {auth.user.role === "organizer" && (
         <div className="profile-section">
-          <h3>📢 Organizer Dashboard</h3>
-          <button
-            className="event-btn"
-            onClick={() => navigate("/create-event")}
-          >
+          <h3>📊 Organizer Dashboard</h3>
+
+          {/* Stats Cards */}
+          <div className="stats-grid">
+            <div className="stat-card green">
+              <h2>{stats.totalEvents}</h2>
+              <p>Total Events</p>
+            </div>
+            <div className="stat-card purple">
+              <h2>{stats.totalAttendees}</h2>
+              <p>Total Attendees</p>
+            </div>
+            <div className="stat-card orange">
+              <h2>${stats.revenue}</h2>
+              <p>Revenue</p>
+            </div>
+          </div>
+
+          <button className="event-btn" onClick={() => navigate("/create-event")}>
             ➕ Create Event
           </button>
 
