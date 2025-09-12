@@ -4,7 +4,10 @@ const router = express.Router();
 const { protect } = require("../middleware/authMiddleware");
 const Event = require("../models/Event");
 const Booking = require("../models/Booking");
-const fetch = require("node-fetch"); // ✅ use node-fetch instead of axios
+
+// ✅ dynamic import for node-fetch (ESM only)
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 /**
  * @route   POST /api/bookings/:eventId
@@ -17,30 +20,28 @@ router.post("/:eventId", protect, async (req, res) => {
     const userId = req.user._id;
 
     const event = await Event.findById(eventId);
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
+    if (!event) return res.status(404).json({ message: "Event not found" });
 
-    // pick the first available ticket type for simplicity
+    // pick the first available ticket type (or later, use req.body.ticketType)
     let ticket = event.tickets[0];
     if (!ticket || ticket.available <= 0) {
       return res.status(400).json({ message: "Tickets sold out!" });
     }
 
-    // prevent double booking (user already booked this event)
+    // prevent double booking
     const existingBooking = await Booking.findOne({ user: userId, event: eventId });
     if (existingBooking) {
       return res.status(400).json({ message: "You already booked this event!" });
     }
 
-    // create new booking
+    // create booking
     const booking = new Booking({
       user: userId,
       event: eventId,
       ticketType: ticket.type,
     });
 
-    // Generate QR Code using GoQR API
+    // generate QR code using GoQR API
     const qrResponse = await fetch(
       `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Booking-${booking._id}`
     );
@@ -54,7 +55,7 @@ router.post("/:eventId", protect, async (req, res) => {
     ticket.available -= 1;
     await event.save();
 
-    res.json(booking);
+    res.json({ booking });
   } catch (err) {
     console.error("Booking error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
