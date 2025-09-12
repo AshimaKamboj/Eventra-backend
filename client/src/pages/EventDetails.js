@@ -73,16 +73,16 @@ function EventDetails() {
   }
 };
 
-      // QR Code
-      const qrBase64 = await getBase64FromUrl(res.data.booking.qrCode);
-      doc.addImage(qrBase64, "PNG", 20, 90, 100, 100);
+  //     // QR Code
+  //     const qrBase64 = await getBase64FromUrl(res.data.booking.qrCode);
+  //     doc.addImage(qrBase64, "PNG", 20, 90, 100, 100);
 
-      doc.save("ticket.pdf");
-    } catch (err) {
-      console.error("Booking error:", err);
-      alert(err.response?.data?.message || "❌ Error booking ticket");
-    }
-  };
+  //     doc.save("ticket.pdf");
+  //   } catch (err) {
+  //     console.error("Booking error:", err);
+  //     alert(err.response?.data?.message || "❌ Error booking ticket");
+  //   }
+  // };
 
   if (loading) return <h2>⏳ Loading event details...</h2>;
   if (!event) return <h2>❌ Event not found</h2>;
