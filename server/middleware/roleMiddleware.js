@@ -5,4 +5,3 @@ module.exports = function authorizeRole(role) {
     next();
   };
 };
-b
