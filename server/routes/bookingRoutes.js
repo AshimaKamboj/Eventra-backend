@@ -1,56 +1,77 @@
+// server/routes/bookingRoutes.js
 const express = require("express");
-const router = express.Router();
-const { protect } = require("../middleware/authMiddleware");
+const axios = require("axios");
 const Booking = require("../models/Booking");
 const Event = require("../models/Event");
-const axios = require("axios");
+const { authMiddleware } = require("../middleware/authMiddleware");
 
-// ✅ Book Ticket
-router.post("/:eventId", protect, async (req, res) => {
+const router = express.Router();
+
+// 📌 POST: Book a ticket
+router.post("/:eventId", authMiddleware, async (req, res) => {
   try {
+    const { ticketType } = req.body;
     const event = await Event.findById(req.params.eventId);
+
     if (!event) return res.status(404).json({ message: "Event not found" });
 
+    // Find ticket type
+    const ticket = event.tickets.find(t => t.type === ticketType);
+    if (!ticket) return res.status(400).json({ message: "Invalid ticket type" });
+
     // Prevent overbooking
-    const totalBooked = await Booking.countDocuments({ event: event._id });
-    if (totalBooked >= event.tickets[0].available) {
-      return res.status(400).json({ message: "Tickets sold out!" });
+    if (ticket.available <= 0) {
+      return res.status(400).json({ message: "No tickets available" });
     }
 
-    // Generate QR code with GoQR API
-    const qrData = `Event: ${event.title}, User: ${req.user.name}, Date: ${event.date}`;
-    const qrResponse = await axios.get(
-      `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`,
-      { responseType: "arraybuffer" }
-    );
-    const qrBase64 = `data:image/png;base64,${Buffer.from(qrResponse.data).toString("base64")}`;
+    // Reduce availability
+    ticket.available -= 1;
+    await event.save();
 
+    // Generate QR Code using GoQR API
+    const qrData = `Event: ${event.title}, User: ${req.user.id}, Ticket: ${ticketType}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
+
+    // Save booking
     const booking = new Booking({
-      user: req.user._id,
+      user: req.user.id,
       event: event._id,
-      ticketType: req.body.ticketType || "General",
-      qrCode: qrBase64,
+      ticketType,
+      qrCode: qrUrl,
     });
 
     await booking.save();
 
-    res.status(201).json(booking);
+    res.json({
+      message: "Booking successful",
+      booking,
+    });
   } catch (err) {
-    console.error("Booking error:", err);
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// ✅ Get bookings for logged-in user
-router.get("/my", protect, async (req, res) => {
-  const bookings = await Booking.find({ user: req.user._id }).populate("event");
-  res.json(bookings);
+// 📌 GET: My bookings
+router.get("/my", authMiddleware, async (req, res) => {
+  try {
+    const bookings = await Booking.find({ user: req.user.id }).populate("event");
+    res.json(bookings);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
-// ✅ Get attendees for organizer
-router.get("/event/:eventId", protect, async (req, res) => {
-  const bookings = await Booking.find({ event: req.params.eventId }).populate("user", "name email");
-  res.json(bookings);
+// 📌 GET: Attendees for an event (organizer only)
+router.get("/event/:eventId", authMiddleware, async (req, res) => {
+  try {
+    const bookings = await Booking.find({ event: req.params.eventId }).populate("user", "name email");
+    res.json(bookings);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 module.exports = router;
