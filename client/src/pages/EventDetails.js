@@ -42,28 +42,36 @@ function EventDetails() {
 
   // Handle ticket booking
   const handleBook = async (ticketType = "General") => {
-    try {
-      const res = await axios.post(
-        `/api/bookings/${id}`,
-        { ticketType },
-        { headers: { Authorization: `Bearer ${auth.token}` } }
-      );
+  try {
+    const res = await axios.post(
+      `/api/bookings/${id}`,
+      { ticketType },
+      { headers: { Authorization: `Bearer ${auth.token}` } }
+    );
 
-      setBooking(res.data.booking);
-      alert("🎉 Ticket booked successfully!");
+    // ✅ Correct: backend sends { booking }
+    setBooking(res.data.booking);
+    alert("🎉 Ticket booked successfully!");
 
-      // Generate PDF Ticket
-      const doc = new jsPDF();
-      doc.setFontSize(18);
-      doc.text("🎟 Eventra Ticket", 20, 20);
-      doc.setFontSize(12);
-      doc.text(`Event: ${event.title}`, 20, 40);
-      doc.text(`Date: ${new Date(event.date).toLocaleDateString()}`, 20, 55);
-      doc.text(
-        `Venue: ${event.location?.venue}, ${event.location?.city}`,
-        20,
-        70
-      );
+    // Generate PDF Ticket
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text("🎟 Eventra Ticket", 20, 20);
+    doc.setFontSize(12);
+    doc.text(`Event: ${event.title}`, 20, 40);
+    doc.text(`Date: ${new Date(event.date).toLocaleDateString()}`, 20, 55);
+    doc.text(`Venue: ${event.location?.venue}, ${event.location?.city}`, 20, 70);
+
+    // QR Code
+    const qrBase64 = res.data.booking.qrCode;
+    doc.addImage(qrBase64, "PNG", 20, 90, 100, 100);
+
+    doc.save("ticket.pdf");
+  } catch (err) {
+    console.error("Booking error:", err);
+    alert(err.response?.data?.message || "❌ Error booking ticket");
+  }
+};
 
       // QR Code
       const qrBase64 = await getBase64FromUrl(res.data.booking.qrCode);
