@@ -10,6 +10,7 @@ function EventDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { auth } = useAuth();
+
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState(null);
@@ -28,24 +29,46 @@ function EventDetails() {
       });
   }, [id]);
 
-  const handleBook = async () => {
-    try {
-      const res = await axios.post(`/api/bookings/${id}`, {}, {
-        headers: { Authorization: `Bearer ${auth.token}` }
-      });
+  // Convert image URL → Base64 for PDF
+  const getBase64FromUrl = async (url) => {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  };
 
-      setBooking(res.data);
+  // Handle ticket booking
+  const handleBook = async (ticketType = "General") => {
+    try {
+      const res = await axios.post(
+        `/api/bookings/${id}`,
+        { ticketType },
+        { headers: { Authorization: `Bearer ${auth.token}` } }
+      );
+
+      setBooking(res.data.booking);
       alert("🎉 Ticket booked successfully!");
 
-      // Generate PDF ticket
+      // Generate PDF Ticket
       const doc = new jsPDF();
-      doc.setFontSize(16);
+      doc.setFontSize(18);
       doc.text("🎟 Eventra Ticket", 20, 20);
       doc.setFontSize(12);
       doc.text(`Event: ${event.title}`, 20, 40);
       doc.text(`Date: ${new Date(event.date).toLocaleDateString()}`, 20, 55);
-      doc.text(`Venue: ${event.location?.venue}, ${event.location?.city}`, 20, 70);
-      doc.addImage(res.data.qrCode, "PNG", 20, 90, 100, 100);
+      doc.text(
+        `Venue: ${event.location?.venue}, ${event.location?.city}`,
+        20,
+        70
+      );
+
+      // QR Code
+      const qrBase64 = await getBase64FromUrl(res.data.booking.qrCode);
+      doc.addImage(qrBase64, "PNG", 20, 90, 100, 100);
+
       doc.save("ticket.pdf");
     } catch (err) {
       console.error("Booking error:", err);
@@ -68,7 +91,8 @@ function EventDetails() {
         <div className="event-info-block">
           <h1 className="event-title">{event.title}</h1>
           <p className="event-meta">
-            📅 {new Date(event.date).toLocaleDateString()} | 📍 {event.location?.city}
+            📅 {new Date(event.date).toLocaleDateString()} | 📍{" "}
+            {event.location?.city}
           </p>
           <p className="event-attendees">👥 {event.attendees || "N/A"} going</p>
 
@@ -91,19 +115,20 @@ function EventDetails() {
               {event.tickets?.map((ticket, idx) => (
                 <li key={idx} className="ticket-item">
                   {ticket.type} - ${ticket.price} ({ticket.available} left)
+                  {auth.user?.role === "user" && ticket.available > 0 && (
+                    <button
+                      className="small-book-btn"
+                      onClick={() => handleBook(ticket.type)}
+                    >
+                      Book {ticket.type}
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* ✅ Show booking button only if user is normal role */}
-          {auth.user?.role === "user" && (
-            <button className="book-btn" onClick={handleBook}>
-              🎟 Book Ticket
-            </button>
-          )}
-
-          {/* ✅ Show booked QR immediately */}
+          {/* ✅ Show booked QR */}
           {booking && (
             <div className="ticket-preview">
               <h3>✅ Your Ticket</h3>
