@@ -1923,7 +1923,7 @@ body {
 
 .attendee-card {
   padding: 6px 10px;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 /* .attendee-card:last-child {
