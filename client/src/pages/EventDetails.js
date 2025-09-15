@@ -146,7 +146,7 @@ function EventDetails() {
         </div>
       </div>
     </div>
-//   );
-// }
+  );
+}
 
-// export default EventDetails;
+export default EventDetails;
