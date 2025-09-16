@@ -151,4 +151,4 @@ function EventDetails() {
 
 export default EventDetails;
 
-mvc- model view controller 
+// mvc- model view controller 
