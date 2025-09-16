@@ -139,7 +139,7 @@ function EventDetails() {
           {/* ✅ Show booked QR */}
           {booking && (
             <div className="ticket-preview">
-              <h3> Your Ticket</h3>
+              <h3>✅ Your Ticket</h3>
               <img src={booking.qrCode} alt="Ticket QR" className="qr-img" />
             </div>
           )}
