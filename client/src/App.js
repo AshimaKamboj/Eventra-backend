@@ -11,7 +11,9 @@ import Features from "./components/Features";
 // Pages
 import Explore from "./pages/Explore";
 import CreateEvent from "./pages/CreateEvent";
-import CreateVenue from "./pages/CreateVenue";
+import CreateVenue from "./pages/CreateVenue"; // original
+import CreateVenueNew from "./pages/CreateVenueNew"; // new form page
+import EditVenue from "./pages/EditVenue"; // <-- newly added
 import Venues from "./pages/Venues";
 import Blog from "./pages/Blog";
 import Support from "./pages/Support";
@@ -44,7 +46,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Navbar /> {/* Navbar automatically shows buttons based on logged-in user */}
+        <Navbar />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
@@ -67,7 +69,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/my-reviews"
             element={
@@ -91,6 +92,22 @@ function App() {
             element={
               <OrganizerRoute>
                 <CreateVenue />
+              </OrganizerRoute>
+            }
+          />
+          <Route
+            path="/venues/create"
+            element={
+              <OrganizerRoute>
+                <CreateVenueNew />
+              </OrganizerRoute>
+            }
+          />
+          <Route
+            path="/venues/edit/:id"  // <-- Added route for editing
+            element={
+              <OrganizerRoute>
+                <EditVenue />
               </OrganizerRoute>
             }
           />
