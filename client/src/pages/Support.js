@@ -1,4 +1,6 @@
+// client/src/pages/Support.js
 import React, { useState } from "react";
+import axios from "axios";
 import "./../style.css";
 
 function Support() {
@@ -19,28 +21,31 @@ function Support() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Log form data for debugging
-    console.log("Form Data Submitted:", formData);
+    try {
+      // Send data to backend
+      await axios.post("/api/support", formData);
 
-    // Simulate a successful send and show the message
-    setIsSent(true);
+      // Show success message
+      setIsSent(true);
 
-    // Clear the form fields
-    setFormData({
-      name: "",
-      email: "",
-      category: "Select a category",
-      subject: "",
-      issue: "",
-    });
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        category: "Select a category",
+        subject: "",
+        issue: "",
+      });
 
-    // Hide the message after 5 seconds
-    setTimeout(() => {
-      setIsSent(false);
-    }, 3000);
+      // Hide message after 3 seconds
+      setTimeout(() => setIsSent(false), 3000);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to submit support request.");
+    }
   };
 
   return (
@@ -60,7 +65,7 @@ function Support() {
           <span className="icon">📧</span>
           <h3>Email Support</h3>
           <p>Get help via email</p>
-          <p className="highlight">support@eventra.com</p>
+          <p className="highlight">teamEventra4u@gmail.com</p>
           <small>Response within 24 hours</small>
         </div>
 
@@ -81,9 +86,9 @@ function Support() {
         </div>
       </section>
 
-      {/* FAQ + Contact */}
+      {/* FAQ + Contact Form */}
       <section className="faq-contact">
-        {/* FAQ */}
+        {/* FAQ Section */}
         <div className="faq">
           <h2>Frequently Asked Questions</h2>
           <input type="text" placeholder="Search FAQs..." className="faq-search" />
@@ -155,8 +160,10 @@ function Support() {
               value={formData.issue}
               onChange={handleChange}
               required
-            ></textarea>
-            <button type="submit" className="send-btn">Send Message</button>
+            />
+            <button type="submit" className="send-btn">
+              Send Message
+            </button>
           </form>
         </div>
       </section>
