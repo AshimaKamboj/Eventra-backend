@@ -24,6 +24,7 @@ import VenueDetails from "./pages/VenueDetails";
 import BlogPost from "./pages/BlogPost";
 import Profile from "./pages/Profile";
 import MyReviews from "./pages/MyReviews";
+import OrderConfirmation from "./pages/OrderConfirmation";
 
 // Auth wrappers
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -59,6 +60,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/event/:id" element={<EventDetails />} />
+          <Route path="/order-confirmation" element={<OrderConfirmation />} />
 
           {/* Protected Routes */}
           <Route

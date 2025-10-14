@@ -12,6 +12,17 @@ function Venues() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const formatCapacity = (cap) => {
+    if (!cap && cap !== 0) return 'N/A';
+    if (typeof cap === 'string') return cap;
+    if (typeof cap === 'object') {
+      const min = cap.min ?? 0;
+      const max = cap.max ?? 0;
+      return `${min} - ${max}`;
+    }
+    return String(cap);
+  };
+
   useEffect(() => {
     fetchVenues();
   }, []);
@@ -96,7 +107,7 @@ function Venues() {
                 {venue.location.address}, {venue.location.city}
               </p>
               <p>
-                <strong>Capacity:</strong> {venue.capacity.min || 0} - {venue.capacity.max} Guests
+                <strong>Capacity:</strong> {formatCapacity(venue.capacity)} Guests
               </p>
               <p className="venue-description">{venue.description}</p>
               <div className="venue-amenities">

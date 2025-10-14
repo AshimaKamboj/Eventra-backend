@@ -18,6 +18,18 @@ function VenueDetails() {
   const [reviewStats, setReviewStats] = useState(null);
   const [userReview, setUserReview] = useState(null);
 
+  // Helper to safely render capacity whether it's a string or an object
+  const formatCapacity = (cap) => {
+    if (!cap && cap !== 0) return 'Capacity not specified';
+    if (typeof cap === 'string') return cap;
+    if (typeof cap === 'object') {
+      const min = cap.min ?? 0;
+      const max = cap.max ?? 0;
+      return `${min} - ${max} Guests`;
+    }
+    return String(cap);
+  };
+
   // Venue data (fallback data)
   const fallbackVenues = [
     {
@@ -195,11 +207,7 @@ function VenueDetails() {
               }
             </p>
             <p>
-              <strong>Capacity:</strong> {
-                venue.capacity?.min && venue.capacity?.max ? 
-                  `${venue.capacity.min} - ${venue.capacity.max} Guests` :
-                  venue.capacity || 'Capacity not specified'
-              }
+              <strong>Capacity:</strong> {formatCapacity(venue.capacity)}
             </p>
             <p className="venue-description">{venue.description}</p>
             {venue.amenities && venue.amenities.length > 0 && (

@@ -20,6 +20,7 @@ function EventDetails() {
   const [loading, setLoading] = useState(true);
 
   const [booking, setBooking] = useState(null);
+  const [showPayNow, setShowPayNow] = useState({});
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewStats, setReviewStats] = useState(null);
   const [userReview, setUserReview] = useState(null);
@@ -43,6 +44,8 @@ function EventDetails() {
   }, [id]); // Handle ticket booking
 
   const handleBook = async (ticketType = "General") => {
+    // Optimistically show the Pay Now button for this ticket type
+    setShowPayNow((prev) => ({ ...prev, [ticketType]: true }));
     try {
       const res = await axios.post(
         `/api/bookings/${id}`,
@@ -85,6 +88,8 @@ function EventDetails() {
       console.error("Booking error:", err);
 
       alert(err.response?.data?.message || "❌ Error booking ticket");
+      // On error, hide the Pay Now button for this ticket type
+      setShowPayNow((prev) => ({ ...prev, [ticketType]: false }));
     }
   };
 
@@ -142,12 +147,50 @@ function EventDetails() {
                     </div>
 
                     {auth.user?.role === "user" && ticket.available > 0 && (
-                      <button
-                        className="btn colorful-button"
-                        onClick={() => handleBook(ticket.type)}
-                      >
-                         🎟 Book {ticket.type}
-                      </button>
+                      <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center' }}>
+                        <button
+                          className="btn colorful-button"
+                          onClick={() => handleBook(ticket.type)}
+                        >
+                          🎟 Book {ticket.type}
+                        </button>
+
+                        {showPayNow[ticket.type] && (
+                          <button
+                            className="btn colorful-button"
+                            style={{ padding: '0.45rem 0.75rem' }}
+                            onClick={async () => {
+                              // Use booking._id as a placeholder order id for payment link creation
+                              try {
+                                if (!booking || !booking._id) {
+                                  alert('No booking found to pay for. Please book first.');
+                                  return;
+                                }
+
+                                const res = await fetch(`/api/payment/${booking._id}`, {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    Authorization: `Bearer ${auth.token}`,
+                                  },
+                                });
+
+                                const data = await res.json();
+                                if (res.ok && data.payment_link_url) {
+                                  window.location.href = data.payment_link_url;
+                                } else {
+                                  alert(data.message || 'Failed to create payment link.');
+                                }
+                              } catch (err) {
+                                console.error('Payment link error', err);
+                                alert('Failed to initiate payment');
+                              }
+                            }}
+                          >
+                            Pay Now
+                          </button>
+                        )}
+                      </div>
                     )}
                   </li>
                 ))}

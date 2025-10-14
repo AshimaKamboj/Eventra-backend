@@ -11,6 +11,17 @@ function VenueSelector({ selectedVenue, onVenueSelect, onCustomVenue }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
+  const formatCapacity = (cap) => {
+    if (!cap && cap !== 0) return 'N/A';
+    if (typeof cap === 'string') return cap;
+    if (typeof cap === 'object') {
+      const min = cap.min ?? 0;
+      const max = cap.max ?? 0;
+      return `${min} - ${max}`;
+    }
+    return String(cap);
+  };
+
   // Fetch venues from API
   useEffect(() => {
     const fetchVenues = async () => {
@@ -102,7 +113,7 @@ function VenueSelector({ selectedVenue, onVenueSelect, onCustomVenue }) {
           <div className="venue-card-small">
             <h5>{selectedVenue.name}</h5>
             <p>{selectedVenue.location.address}, {selectedVenue.location.city}</p>
-            <p>Capacity: {selectedVenue.capacity.min} - {selectedVenue.capacity.max} guests</p>
+            <p>Capacity: {formatCapacity(selectedVenue.capacity)} guests</p>
             <button 
               className="btn-outline btn-small"
               onClick={() => onVenueSelect(null)}
@@ -136,7 +147,7 @@ function VenueSelector({ selectedVenue, onVenueSelect, onCustomVenue }) {
                     >
                       <div className="venue-item">
                         <h5>{venue.name}</h5>
-                        <p>{venue.location.city} • {venue.capacity.min}-{venue.capacity.max} guests</p>
+                        <p>{venue.location.city} • {formatCapacity(venue.capacity)} guests</p>
                       </div>
                     </div>
                   ))}
