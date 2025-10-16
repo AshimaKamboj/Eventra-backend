@@ -35,6 +35,8 @@ function CreateVenue() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { auth } = useAuth();
+  const [venueCreated, setVenueCreated] = useState(false);
+  const [createdVenue, setCreatedVenue] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,8 +82,9 @@ function CreateVenue() {
         }
       });
 
-      alert("✅ Venue Created Successfully!");
-      navigate("/venues");
+  // Show a success modal instead of redirecting
+  setCreatedVenue(response.data);
+  setVenueCreated(true);
     } catch (error) {
       console.error("Error creating venue:", error);
       alert("Error creating venue. Please try again.");
@@ -92,7 +95,7 @@ function CreateVenue() {
 
   return (
     <div className="create-venue">
-      <div className="form-container">
+      <div className="form-container" style={{ maxWidth: 900, margin: '40px auto', background: '#fff', padding: 28, borderRadius: 12, boxShadow: '0 12px 40px rgba(0,0,0,0.08)' }}>
         <h1 className="form-title">Create New Venue</h1>
         <p className="form-subtitle">
           Add your venue to our platform and make it available for event organizers.
@@ -273,6 +276,23 @@ function CreateVenue() {
           </div>
         </form>
       </div>
+
+      {/* Success modal */}
+      {venueCreated && createdVenue && (
+        <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)', zIndex: 2000 }}>
+          <div style={{ background: '#fff', padding: 24, borderRadius: 10, width: 560, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <h3>✅ Venue Created</h3>
+            <p style={{ marginTop: 8 }}>Your venue "{createdVenue.name}" was created successfully.</p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 16 }}>
+              <button className="btn" onClick={() => setVenueCreated(false)}>Close</button>
+              <button className="btn colorful-button" onClick={() => {
+                // navigate to create event with venue preselected (if route supports it)
+                navigate(`/create-event?venueId=${createdVenue._id}`);
+              }}>Create Event</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

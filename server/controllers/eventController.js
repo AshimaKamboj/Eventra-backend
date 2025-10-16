@@ -14,8 +14,9 @@ const createEvent = async (req, res) => {
       ];
     }
 
-    // Attach organizer ID
-    payload.organizer = req.user._id;
+  // Attach organizer ID and createdBy for compatibility
+  payload.organizer = req.user._id;
+  payload.createdBy = req.user._id;
 
     const event = new Event(payload);
     await event.save();
@@ -72,13 +73,16 @@ const getEventById = async (req, res) => {
 // =======================
 const updateEvent = async (req, res) => {
   try {
-    const event = await Event.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-
+    const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: "Event not found" });
 
+    // Only organizer/creator can update
+    const userId = req.user?._id?.toString();
+    const ownerId = (event.createdBy || event.organizer || '').toString();
+    if (userId !== ownerId) return res.status(403).json({ message: 'You are not allowed to update this event' });
+
+    Object.assign(event, req.body);
+    await event.save();
     res.json(event);
   } catch (err) {
     console.error("Error updating event:", err);
@@ -91,10 +95,15 @@ const updateEvent = async (req, res) => {
 // =======================
 const deleteEvent = async (req, res) => {
   try {
-    const event = await Event.findByIdAndDelete(req.params.id);
-
+    const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: "Event not found" });
 
+    // Only creator/organizer can delete
+    const userId = req.user?._id?.toString();
+    const ownerId = (event.createdBy || event.organizer || '').toString();
+    if (userId !== ownerId) return res.status(403).json({ message: 'You are not allowed to delete this event' });
+
+    await Event.findByIdAndDelete(req.params.id);
     res.json({ message: "Event deleted successfully" });
   } catch (err) {
     console.error("Error deleting event:", err);

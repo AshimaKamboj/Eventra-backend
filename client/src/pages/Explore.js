@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import "../style.css";
-
 function Explore() {
   // Static/demo events
   const demoEvents = [
@@ -53,6 +52,8 @@ function Explore() {
 
   const [dbEvents, setDbEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  // placeholder state (no organizer controls on this page)
+  // no organizer controls on this page
 
   // Fetch events from backend
   useEffect(() => {
@@ -98,9 +99,11 @@ function Explore() {
                   : event.date}
                 {" • "}📍 {event.location?.city || event.location}
               </p>
-              <Link to={`/event/${event._id || event.id}`}>
-                <button className="event-btn">View Details</button>
-              </Link>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <Link to={`/event/${event._id || event.id}`}>
+                  <button className="event-btn">View Details</button>
+                </Link>
+              </div>
             </div>
           </div>
         ))}
