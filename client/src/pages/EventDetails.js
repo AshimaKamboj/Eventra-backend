@@ -21,6 +21,7 @@ function EventDetails() {
 
   const [booking, setBooking] = useState(null);
   const [showPayNow, setShowPayNow] = useState({});
+  const [popup, setPopup] = useState({ show: false, message: '' });
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewStats, setReviewStats] = useState(null);
   const [userReview, setUserReview] = useState(null);
@@ -44,52 +45,48 @@ function EventDetails() {
   }, [id]); // Handle ticket booking
 
   const handleBook = async (ticketType = "General") => {
-    // Optimistically show the Pay Now button for this ticket type
-    setShowPayNow((prev) => ({ ...prev, [ticketType]: true }));
     try {
+      // 1) create booking
       const res = await axios.post(
         `/api/bookings/${id}`,
-
         { ticketType },
-
         { headers: { Authorization: `Bearer ${auth.token}` } }
       );
 
-      setBooking(res.data.booking);
+      const newBooking = res.data.booking;
+      setBooking(newBooking);
 
-      alert("🎉 Ticket booked successfully!"); // Generate PDF Ticket
+      // 2) create payment link for this booking and immediately redirect
+      try {
+        const payRes = await fetch(`/api/payment/${newBooking._id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`,
+          },
+        });
 
-      const doc = new jsPDF();
-
-      doc.setFontSize(18);
-
-      doc.text("🎟 Eventra Ticket", 20, 20);
-
-      doc.setFontSize(12);
-
-      doc.text(`Event: ${event.title}`, 20, 40);
-
-      doc.text(`Date: ${new Date(event.date).toLocaleDateString()}`, 20, 55);
-
-      doc.text(
-        `Venue: ${event.location?.venue}, ${event.location?.city}`,
-
-        20,
-
-        70
-      ); // QR Code
-
-      const qrBase64 = res.data.booking.qrCode;
-
-      doc.addImage(qrBase64, "PNG", 20, 90, 100, 100);
-
-      doc.save("ticket.pdf");
+        const payData = await payRes.json();
+        if (payRes.ok && payData.payment_link_url) {
+          // redirect user to Razorpay payment page
+          window.location.href = payData.payment_link_url;
+        } else {
+          // Inform user and keep them on page so they can retry
+          alert(payData.message || 'Failed to create payment link.');
+        }
+      } catch (err) {
+        console.error('Payment link creation failed', err);
+        alert('Failed to initiate payment. Please try again.');
+      }
     } catch (err) {
-      console.error("Booking error:", err);
-
-      alert(err.response?.data?.message || "❌ Error booking ticket");
-      // On error, hide the Pay Now button for this ticket type
-      setShowPayNow((prev) => ({ ...prev, [ticketType]: false }));
+      console.error('Booking error:', err);
+      const msg = err.response?.data?.message || '❌ Error booking ticket';
+      // If user already booked, show a popup instead of an alert
+      if (msg.toLowerCase().includes('already booked') || msg.toLowerCase().includes('already booked this event') || msg.toLowerCase().includes('you already booked')) {
+        setPopup({ show: true, message: msg });
+      } else {
+        alert(msg);
+      }
     }
   };
 
@@ -154,42 +151,6 @@ function EventDetails() {
                         >
                           🎟 Book {ticket.type}
                         </button>
-
-                        {showPayNow[ticket.type] && (
-                          <button
-                            className="btn colorful-button"
-                            style={{ padding: '0.45rem 0.75rem' }}
-                            onClick={async () => {
-                              // Use booking._id as a placeholder order id for payment link creation
-                              try {
-                                if (!booking || !booking._id) {
-                                  alert('No booking found to pay for. Please book first.');
-                                  return;
-                                }
-
-                                const res = await fetch(`/api/payment/${booking._id}`, {
-                                  method: 'POST',
-                                  headers: {
-                                    'Content-Type': 'application/json',
-                                    Authorization: `Bearer ${auth.token}`,
-                                  },
-                                });
-
-                                const data = await res.json();
-                                if (res.ok && data.payment_link_url) {
-                                  window.location.href = data.payment_link_url;
-                                } else {
-                                  alert(data.message || 'Failed to create payment link.');
-                                }
-                              } catch (err) {
-                                console.error('Payment link error', err);
-                                alert('Failed to initiate payment');
-                              }
-                            }}
-                          >
-                            Pay Now
-                          </button>
-                        )}
                       </div>
                     )}
                   </li>
@@ -197,8 +158,8 @@ function EventDetails() {
               </ul>
             </div> 
 
-            {/* ✅ Show booked QR */}
-            {booking && (
+            {/* ✅ Show booked QR only after payment confirmation */}
+            {booking && (booking.paymentDetails?.status === 'Paid' || booking.status === 'Confirmed') && (
               <div className="ticket-preview">
                 <h3> Your Ticket</h3>
 
@@ -271,7 +232,18 @@ function EventDetails() {
         {" "}
       </div>
       {" "}
-    </div>
+      {/* Simple popup for messages like 'already booked' */}
+      {popup.show && (
+        <div style={{ position: 'fixed', right: 20, top: 20, zIndex: 1200 }}>
+          <div style={{ background: '#fff', border: '1px solid #ddd', padding: 16, borderRadius: 8, boxShadow: '0 6px 18px rgba(0,0,0,0.12)' }}>
+            <p style={{ margin: 0, fontWeight: 600 }}>{popup.message}</p>
+            <div style={{ marginTop: 8, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+              <button className="btn" onClick={() => setPopup({ show: false, message: '' })}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+      </div>
   );
 }
 

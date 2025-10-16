@@ -85,7 +85,9 @@ const updatePaymentInformation = async(reqData) => {
             await booking.save();
         }
 
-        const resData = { message: "Your booking is confirmed", success: true };
+        // Return updated booking so frontend can show QR and success message
+        const updatedBooking = await Booking.findById(orderId);
+        const resData = { message: "Your booking is confirmed", success: true, booking: updatedBooking };
         return resData;
     } catch (error) {
         console.error('Error updating payment information:', error);

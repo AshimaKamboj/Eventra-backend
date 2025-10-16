@@ -20,6 +20,7 @@ const createPaymentLink = async (req, res) => {
 const updatePaymentInformation = async (req, res) => {
     try {
         const result = await paymentService.updatePaymentInformation(req.query);
+        // result may include booking; forward it to frontend for UI
         return res.status(200).json({ ...result, status: true });
     } catch (error) {
         const message = typeof error?.message === 'string' ? error.message : 'Failed to update payment information';
