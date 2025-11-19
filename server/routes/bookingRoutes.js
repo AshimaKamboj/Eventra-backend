@@ -4,14 +4,14 @@ const protect = require("../middleware/authMiddleware");
 const Event = require("../models/Event");
 const Booking = require("../models/Booking");
 
-// ✅ dynamic import for node-fetch (fix ESM issue)
+// dynamic import for node-fetch (fix ESM issue)
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 /**
- * @route   POST /api/bookings/:eventId
- * @desc    Book a ticket for an event
- * @access  Private (Users only)
+ * POST /api/bookings/:eventId
+ * Book a ticket for an event
+ * Private (Users only)
  */
 router.post("/:eventId", protect, async (req, res) => {
   try {
@@ -63,9 +63,9 @@ router.post("/:eventId", protect, async (req, res) => {
 });
 
 /**
- * @route   GET /api/bookings/my
- * @desc    Get logged-in user's bookings
- * @access  Private
+ *  GET /api/bookings/my
+ *  Get logged-in user's bookings
+ *  Private
  */
 router.get("/my", protect, async (req, res) => {
   try {
@@ -79,9 +79,9 @@ router.get("/my", protect, async (req, res) => {
 });
 
 /**
- * @route   GET /api/bookings/event/:eventId
- * @desc    Organizer can see attendees list
- * @access  Private
+ * GET /api/bookings/event/:eventId
+ *    Organizer can see attendees list
+ *  Private
  */
 router.get("/event/:eventId", protect, async (req, res) => {
   try {

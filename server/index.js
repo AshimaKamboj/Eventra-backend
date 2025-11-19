@@ -57,12 +57,12 @@ const server = app.listen(PORT, () => console.log(` Server running on port ${POR
 
 server.on('error', (err) => {
   if (err && err.code === 'EADDRINUSE') {
-    console.error(`\nError: Port ${PORT} is already in use.\n` +
-      `- Either stop the process currently using the port or set PORT to a different value.\n` +
-      `- On Windows (PowerShell) you can run:\n` +
+    console.error(\nError: Port ${PORT} is already in use.\n +
+      - Either stop the process currently using the port or set PORT to a different value.\n +
+      - On Windows (PowerShell) you can run:\n +
       `    Get-Process -Id (Get-NetTCPConnection -LocalPort ${PORT}).OwningProcess | Format-List Id,ProcessName\n` +
       `    Stop-Process -Id <PID>\n` +
-      `- Or start this server with a different port:\n` +
+      - Or start this server with a different port:\n +
       `    $env:PORT=3001; npm start\n`);
     process.exit(1);
   }
