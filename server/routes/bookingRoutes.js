@@ -40,10 +40,28 @@ router.post("/:eventId", protect, async (req, res) => {
       event: eventId,
       ticketType: ticket.type,
     });
+    await booking.save();
 
-    // Generate QR Code using GoQR API
+    // Populate event and user to get full details for QR
+    await booking.populate('event');
+    await booking.populate('user');
+
+    // Prepare detailed QR data
+    const qrData = {
+      bookingId: booking._id,
+      eventName: booking.event?.title || 'Event',
+      userName: booking.user?.name || 'Guest',
+      userEmail: booking.user?.email || '',
+      ticketType: booking.ticketType,
+      eventDate: booking.event?.date || '',
+      venue: booking.event?.location?.venue || '',
+      city: booking.event?.location?.city || ''
+    };
+
+    // Generate QR Code with detailed JSON data
+    const qrDataString = encodeURIComponent(JSON.stringify(qrData));
     const qrResponse = await fetch(
-      `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Booking-${booking._id}`
+      `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${qrDataString}`
     );
     const qrBuffer = await qrResponse.arrayBuffer();
     const qrBase64 = `data:image/png;base64,${Buffer.from(qrBuffer).toString("base64")}`;
