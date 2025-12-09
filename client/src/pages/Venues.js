@@ -154,7 +154,8 @@ function Venues() {
                   View Details
                 </button>
 
-                {auth.user && (
+                {/* Only organizers can edit and delete venues */}
+                {auth.user && auth.user.role === "organizer" && (
                   <>
                     <button
                       onClick={() => navigate(`/venues/edit/${venue._id}`)}
@@ -212,8 +213,8 @@ function Venues() {
         ))}
       </div>
 
-      {/* Create New Venue Button after cards */}
-      {auth.user && (
+      {/* Create New Venue Button - Only for organizers */}
+      {auth.user && auth.user.role === "organizer" && (
         <div style={{ textAlign: "center", marginTop: "2rem" }}>
           <button
             className="btn-primary"

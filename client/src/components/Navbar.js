@@ -28,12 +28,14 @@ function Navbar() {
       <div className="nav-center">
         <Link to="/explore">Explore</Link>
 
-        {/* ✅ Only organizers see Create Event */}
+        {/* ✅ Only organizers see Create Event and Venues */}
         {auth?.user?.role === "organizer" && (
-          <Link to="/create-event">Create Event</Link>
+          <>
+            <Link to="/create-event">Create Event</Link>
+            <Link to="/venues">Venues</Link>
+          </>
         )}
 
-        <Link to="/venues">Venues</Link>
         <Link to="/blog">Blog</Link>
         <Link to="/support">Support</Link>
       </div>
