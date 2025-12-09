@@ -67,6 +67,7 @@ export default function OrderConfirmation() {
     const userName = booking.user?.name || 'Guest';
     const userEmail = booking.user?.email || '';
     const ticketType = booking.ticketType || 'General';
+    const quantity = booking.quantity || 1;
     const bookingId = booking._id || '';
     const eventDate = booking.event?.date ? new Date(booking.event.date).toLocaleString() : '';
     const venueParts = [
@@ -95,7 +96,8 @@ export default function OrderConfirmation() {
     doc.text(`Attendee: ${userName}`, 22, 75);
     if (userEmail) doc.text(`Email: ${userEmail}`, 22, 85);
     doc.text(`Ticket Type: ${ticketType}`, 22, 95);
-    if (bookingId) doc.text(`Booking ID: ${bookingId}`, 22, 105);
+    doc.text(`Quantity: ${quantity} ticket(s)`, 22, 105);
+    if (bookingId) doc.text(`Booking ID: ${bookingId}`, 22, 115);
 
     // QR code if present
     if (booking.qrCode) {
@@ -108,7 +110,7 @@ export default function OrderConfirmation() {
     }
 
     doc.setFontSize(10);
-    doc.text('Please carry a valid ID. Non-transferable.', 20, 150);
+    doc.text('Please carry a valid ID. Non-transferable.', 20, 160);
 
     const safeTitle = eventTitle.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
     doc.save(`ticket-${safeTitle || 'event'}.pdf`);

@@ -16,8 +16,14 @@ const bookingSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  quantity: {
+    type: Number,
+    required: true,
+    default: 1,
+    min: 1,
+  },
   qrCode: {
-    type: String, // we’ll store the GoQR image URL
+    type: String, // we'll store the GoQR image URL
   },
   createdAt: {
     type: Date,

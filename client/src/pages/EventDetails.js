@@ -25,6 +25,7 @@ function EventDetails() {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewStats, setReviewStats] = useState(null);
   const [userReview, setUserReview] = useState(null);
+  const [ticketQuantities, setTicketQuantities] = useState({});
 
   useEffect(() => {
     axios
@@ -44,12 +45,16 @@ function EventDetails() {
       });
   }, [id]); // Handle ticket booking
 
-  const handleBook = async (ticketType = "General") => {
+  const handleBook = async (ticketType = "General", quantity = 1) => {
+    if (quantity < 1) {
+      alert('Please select at least 1 ticket');
+      return;
+    }
     try {
       // 1) create booking
       const res = await axios.post(
         `/api/bookings/${id}`,
-        { ticketType },
+        { ticketType, quantity },
         { headers: { Authorization: `Bearer ${auth.token}` } }
       );
 
@@ -145,9 +150,30 @@ function EventDetails() {
 
                     {auth.user?.role === "user" && ticket.available > 0 && (
                       <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center' }}>
+                        <label style={{ fontSize: '14px', fontWeight: '500' }}>
+                          Quantity:
+                          <input
+                            type="number"
+                            min="1"
+                            max={ticket.available}
+                            value={ticketQuantities[ticket.type] || 1}
+                            onChange={(e) => setTicketQuantities({
+                              ...ticketQuantities,
+                              [ticket.type]: parseInt(e.target.value) || 1
+                            })}
+                            style={{
+                              width: '60px',
+                              marginLeft: '8px',
+                              padding: '6px',
+                              border: '1px solid #ddd',
+                              borderRadius: '4px',
+                              fontSize: '14px'
+                            }}
+                          />
+                        </label>
                         <button
                           className="btn colorful-button"
-                          onClick={() => handleBook(ticket.type)}
+                          onClick={() => handleBook(ticket.type, ticketQuantities[ticket.type] || 1)}
                         >
                           🎟 Book {ticket.type}
                         </button>
