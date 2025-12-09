@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
-import jsPDF from "jspdf";
 import ReviewList from "../components/ReviewList";
 import ReviewForm from "../components/ReviewForm";
 import StarRating from "../components/StarRating";
@@ -20,7 +19,6 @@ function EventDetails() {
   const [loading, setLoading] = useState(true);
 
   const [booking, setBooking] = useState(null);
-  const [showPayNow, setShowPayNow] = useState({});
   const [popup, setPopup] = useState({ show: false, message: '' });
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewStats, setReviewStats] = useState(null);
@@ -148,35 +146,48 @@ function EventDetails() {
                       {ticket.type} - ${ticket.price} ({ticket.available} left)
                     </div>
 
-                    {auth.user?.role === "user" && ticket.available > 0 && (
+                    {ticket.available > 0 && (
                       <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center' }}>
-                        <label style={{ fontSize: '14px', fontWeight: '500' }}>
-                          Quantity:
-                          <input
-                            type="number"
-                            min="1"
-                            max={ticket.available}
-                            value={ticketQuantities[ticket.type] || 1}
-                            onChange={(e) => setTicketQuantities({
-                              ...ticketQuantities,
-                              [ticket.type]: parseInt(e.target.value) || 1
-                            })}
-                            style={{
-                              width: '60px',
-                              marginLeft: '8px',
-                              padding: '6px',
-                              border: '1px solid #ddd',
-                              borderRadius: '4px',
-                              fontSize: '14px'
-                            }}
-                          />
-                        </label>
-                        <button
-                          className="btn colorful-button"
-                          onClick={() => handleBook(ticket.type, ticketQuantities[ticket.type] || 1)}
-                        >
-                          🎟 Book {ticket.type}
-                        </button>
+                        {auth.user?.role === "user" && (
+                          <>
+                            <label style={{ fontSize: '14px', fontWeight: '500' }}>
+                              Quantity:
+                              <input
+                                type="number"
+                                min="1"
+                                max={ticket.available}
+                                value={ticketQuantities[ticket.type] || 1}
+                                onChange={(e) => setTicketQuantities({
+                                  ...ticketQuantities,
+                                  [ticket.type]: parseInt(e.target.value) || 1
+                                })}
+                                style={{
+                                  width: '60px',
+                                  marginLeft: '8px',
+                                  padding: '6px',
+                                  border: '1px solid #ddd',
+                                  borderRadius: '4px',
+                                  fontSize: '14px'
+                                }}
+                              />
+                            </label>
+                            <button
+                              className="btn colorful-button"
+                              onClick={() => handleBook(ticket.type, ticketQuantities[ticket.type] || 1)}
+                            >
+                              🎟 Book {ticket.type}
+                            </button>
+                          </>
+                        )}
+
+                        {!auth.user && (
+                          <button
+                            className="btn colorful-button"
+                            onClick={() => navigate('/login')}
+                          >
+                            🎟 Book {ticket.type}
+                          </button>
+                        )}
                       </div>
                     )}
                   </li>
