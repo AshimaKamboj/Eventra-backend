@@ -62,19 +62,56 @@ export default function OrderConfirmation() {
   // Helper to download ticket PDF with QR
   const downloadPdf = () => {
     if (!booking) return;
+
+    const eventTitle = booking.event?.title || 'Event';
+    const userName = booking.user?.name || 'Guest';
+    const userEmail = booking.user?.email || '';
+    const ticketType = booking.ticketType || 'General';
+    const bookingId = booking._id || '';
+    const eventDate = booking.event?.date ? new Date(booking.event.date).toLocaleString() : '';
+    const venueParts = [
+      booking.event?.location?.venue,
+      booking.event?.location?.address,
+      booking.event?.location?.city,
+      booking.event?.location?.country,
+    ].filter(Boolean);
+    const venueLine = venueParts.join(', ');
+
     const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text('🎟 Eventra Ticket', 20, 20);
+
+    // Header
+    doc.setFontSize(20);
+    doc.text('Eventra Ticket', 20, 20);
+
+    // Box background
+    doc.setDrawColor(120, 120, 120);
+    doc.setLineWidth(0.4);
+    doc.roundedRect(15, 28, 180, 120, 3, 3);
+
     doc.setFontSize(12);
-    doc.text(`Event: ${booking.event?.title || ''}`, 20, 40);
+    doc.text(`Event: ${eventTitle}`, 22, 45);
+    if (eventDate) doc.text(`Date & Time: ${eventDate}`, 22, 55);
+    if (venueLine) doc.text(`Venue: ${venueLine}`, 22, 65);
+    doc.text(`Attendee: ${userName}`, 22, 75);
+    if (userEmail) doc.text(`Email: ${userEmail}`, 22, 85);
+    doc.text(`Ticket Type: ${ticketType}`, 22, 95);
+    if (bookingId) doc.text(`Booking ID: ${bookingId}`, 22, 105);
+
+    // QR code if present
     if (booking.qrCode) {
       try {
-        doc.addImage(booking.qrCode, 'PNG', 20, 60, 100, 100);
+        doc.addImage(booking.qrCode, 'PNG', 140, 55, 45, 45);
+        doc.text('Scan for entry', 140, 108);
       } catch (e) {
         console.warn('Failed to embed QR into PDF', e);
       }
     }
-    doc.save('ticket.pdf');
+
+    doc.setFontSize(10);
+    doc.text('Please carry a valid ID. Non-transferable.', 20, 150);
+
+    const safeTitle = eventTitle.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+    doc.save(`ticket-${safeTitle || 'event'}.pdf`);
   };
 
   return (

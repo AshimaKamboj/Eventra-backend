@@ -1,22 +1,8 @@
-// server/index.js
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const path = require("path");
-const { MongoMemoryServer } = require("mongodb-memory-server");
-const Event = require("./models/Event");
+const mongoose = require('mongoose');
+require('dotenv').config();
+const Event = require('./models/Event');
+const { MongoMemoryServer } = require('mongodb-memory-server');
 
-const authRoutes = require("./routes/authRoutes");
-const eventRoutes = require("./routes/eventRoutes");
-const bookingRoutes = require("./routes/bookingRoutes");
-const venueRoutes = require("./routes/venueRoutes");
-const reviewRoutes = require("./routes/reviewRoutes");
-const paymentRoutes = require("./routes/paymentRoutes");
-
-const app = express();
-
-// Sample events for seeding
 const sampleEvents = [
   {
     title: "Tech Conference 2025",
@@ -134,80 +120,37 @@ const sampleEvents = [
   }
 ];
 
-// const __dirname = path.resolve();
-
-// Middleware
-app.use(cors({
-  origin: "*",
-  credentials: true
-}));
-app.use(express.json());
-
-// MongoDB Connection - Use In-Memory Server for development
-async function connectDB() {
+async function seedEvents() {
   try {
-    const mongoUri = process.env.NODE_ENV === 'development' 
-      ? (await MongoMemoryServer.create()).getUri()
-      : process.env.MONGO_URI;
+    let mongoUri;
     
+    if (process.env.NODE_ENV === 'development' || !process.env.MONGO_URI) {
+      const mongoServer = await MongoMemoryServer.create();
+      mongoUri = mongoServer.getUri();
+    } else {
+      mongoUri = process.env.MONGO_URI;
+    }
+
     await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    
-    console.log(" ✅ MongoDB connected (In-Memory for Development)");
-    
-    // Seed events if in development
-    if (process.env.NODE_ENV === 'development') {
-      const eventCount = await Event.countDocuments();
-      if (eventCount === 0) {
-        await Event.insertMany(sampleEvents);
-        console.log(" ✅ Sample events seeded successfully!");
-      }
-    }
+
+    console.log('Connected to database');
+
+    // Clear existing events
+    await Event.deleteMany({});
+    console.log('Cleared existing events');
+
+    // Insert sample events
+    const result = await Event.insertMany(sampleEvents);
+    console.log(`✅ Seeded ${result.length} events successfully!`);
+
+    await mongoose.connection.close();
   } catch (err) {
-    console.error(" ❌ Mongo connect error:", err);
+    console.error('❌ Seeding error:', err);
     process.exit(1);
   }
 }
 
-connectDB();
-
-// Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/events", eventRoutes);
-app.use("/api/bookings", bookingRoutes);
-app.use("/api/venues", venueRoutes);
-app.use("/api/reviews", reviewRoutes);
-app.use("/api/payment", paymentRoutes);
-
-if(process.env.NODE_ENV === 'production'){
-  app.use(express.static(path.join(__dirname, "../client/build")));
-
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, "../client/build/index.html"));
-  });
-}
-
-// Health Check
-app.get("/", (req, res) => res.send(" Eventra API running"));
-
-// Start Server with error handling
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => console.log(` Server running on port ${PORT}`));
-
-server.on('error', (err) => {
-  if (err && err.code === 'EADDRINUSE') {
-    console.error(`\nError: Port ${PORT} is already in use.\n` +
-      `- Either stop the process currently using the port or set PORT to a different value.\n` +
-      `- On Windows (PowerShell) you can run:\n` +
-      `    Get-Process -Id (Get-NetTCPConnection -LocalPort ${PORT}).OwningProcess | Format-List Id,ProcessName\n` +
-      `    Stop-Process -Id <PID>\n` +
-      `- Or start this server with a different port:\n` +
-      `    $env:PORT=3001; npm start\n`);
-    process.exit(1);
-  }
-
-  console.error('Server error:', err);
-  process.exit(1);
-});
+seedEvents();
