@@ -1,4 +1,6 @@
 import React, { useMemo, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 // Simple goodies catalog for merch
 const GOODS = [
@@ -50,6 +52,8 @@ const GOODS = [
 ];
 
 function Goodies() {
+  const { auth } = useAuth();
+  const navigate = useNavigate();
   const [cart, setCart] = useState({});
   const [shipping, setShipping] = useState({
     name: "",
@@ -99,6 +103,11 @@ function Goodies() {
 
   const handleCheckout = async () => {
     if (!cartItems.length) return;
+    if (!auth.token) {
+      alert("Please login to checkout.");
+      navigate("/login");
+      return;
+    }
     const required = ["name", "email", "phone", "address", "city", "zip", "country"];
     const missing = required.filter((k) => !shipping[k]?.trim());
     if (missing.length) {
@@ -143,17 +152,40 @@ function Goodies() {
           shipping_address: `${shipping.address}, ${shipping.city} ${shipping.zip}, ${shipping.country}`,
         },
         handler: (response) => {
-          setStatus("Payment successful. Thank you!");
-          setCart({});
-          setShipping({
-            name: "",
-            email: "",
-            phone: "",
-            address: "",
-            city: "",
-            zip: "",
-            country: "",
-          });
+          setStatus("Payment successful. Saving order...");
+          fetch("/api/goodies/confirm", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${auth.token}`,
+            },
+            body: JSON.stringify({
+              cartItems: cartItems.map((item) => ({ id: item.id, name: item.name, price: item.price, qty: item.qty })),
+              shipping,
+              amount: data.amount,
+              currency: data.currency,
+              razorpayOrderId: data.orderId,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            }),
+          })
+            .then((r) => r.json())
+            .then(() => {
+              setStatus("Payment successful. Order saved!");
+              setCart({});
+              setShipping({
+                name: "",
+                email: "",
+                phone: "",
+                address: "",
+                city: "",
+                zip: "",
+                country: "",
+              });
+            })
+            .catch(() => {
+              setError("Payment done but failed to save order");
+            });
         },
       };
 

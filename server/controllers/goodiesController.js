@@ -1,4 +1,5 @@
 const razorpay = require("../config/razorpayClient");
+const GoodiesOrder = require("../models/GoodiesOrder");
 
 // POST /api/goodies/checkout
 // Creates a Razorpay order for the goodies cart
@@ -59,4 +60,57 @@ const createGoodiesOrder = async (req, res) => {
   }
 };
 
-module.exports = { createGoodiesOrder };
+// POST /api/goodies/confirm
+// Persists a paid goodies order linked to the authenticated user
+const confirmGoodiesOrder = async (req, res) => {
+  try {
+    const { cartItems, shipping, amount, currency, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body || {};
+
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: "Login required to save order" });
+    }
+
+    if (!Array.isArray(cartItems) || !cartItems.length) {
+      return res.status(400).json({ message: "Cart is empty" });
+    }
+
+    if (!razorpayOrderId || !razorpayPaymentId) {
+      return res.status(400).json({ message: "Payment details missing" });
+    }
+
+    const order = await GoodiesOrder.create({
+      user: req.user.id,
+      cartItems,
+      amount,
+      currency,
+      shipping,
+      razorpayOrderId,
+      razorpayPaymentId,
+      razorpaySignature,
+      status: "paid",
+    });
+
+    return res.status(201).json(order);
+  } catch (error) {
+    console.error("Goodies confirm error:", error);
+    return res.status(500).json({ message: error?.message || "Failed to save order" });
+  }
+};
+
+// GET /api/goodies/my
+// Returns goodies orders for the logged-in user
+const listMyGoodiesOrders = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const orders = await GoodiesOrder.find({ user: req.user.id }).sort({ createdAt: -1 });
+    return res.status(200).json(orders);
+  } catch (error) {
+    console.error("Goodies list error:", error);
+    return res.status(500).json({ message: "Failed to fetch orders" });
+  }
+};
+
+module.exports = { createGoodiesOrder, confirmGoodiesOrder, listMyGoodiesOrders };

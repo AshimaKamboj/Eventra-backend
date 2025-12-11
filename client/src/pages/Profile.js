@@ -10,6 +10,7 @@ function Profile() {
   const navigate = useNavigate();
 
   const [bookings, setBookings] = useState([]);
+  const [goodiesOrders, setGoodiesOrders] = useState([]);
   const [myEvents, setMyEvents] = useState([]);
   const [attendees, setAttendees] = useState({});
   const [stats, setStats] = useState({ totalEvents: 0, totalAttendees: 0, revenue: 0 });
@@ -31,6 +32,13 @@ function Profile() {
           setLoading(false);
         })
         .catch(() => setLoading(false));
+
+      axios
+        .get("/api/goodies/my", {
+          headers: { Authorization: `Bearer ${auth.token}` },
+        })
+        .then((res) => setGoodiesOrders(res.data))
+        .catch(() => {});
     }
   }, [auth]);
 
@@ -126,6 +134,45 @@ function Profile() {
             </ul>
           ) : (
             <p>No bookings yet.</p>
+          )}
+        </div>
+      )}
+
+      {/* Goodies Orders */}
+      {auth.user.role === "user" && (
+        <div className="profile-section">
+          <h3>🛍 My Goodies Orders</h3>
+          {goodiesOrders.length > 0 ? (
+            <ul className="booking-list">
+              {goodiesOrders.map((o) => (
+                <li key={o._id} className="booking-card">
+                  <div>
+                    <h4>Order #{o.razorpayOrderId || o._id.slice(-6)}</h4>
+                    <p>
+                      ₹{(o.amount / 100).toFixed(2)} · {o.currency}
+                    </p>
+                    <p>
+                      {new Date(o.createdAt || o._id.slice(0, 8)).toLocaleString()}
+                    </p>
+                    <p style={{ marginTop: "0.5rem", fontWeight: 600 }}>Items:</p>
+                    <ul style={{ paddingLeft: "1rem", color: "#4b5563" }}>
+                      {o.cartItems.map((item, idx) => (
+                        <li key={idx}>
+                          {item.name} × {item.qty} — ₹{item.price}
+                        </li>
+                      ))}
+                    </ul>
+                    {o.shipping?.address && (
+                      <p style={{ marginTop: "0.5rem" }}>
+                        Ship to: {o.shipping.name}, {o.shipping.address}, {o.shipping.city} {o.shipping.zip}, {o.shipping.country}
+                      </p>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No goodies orders yet.</p>
           )}
         </div>
       )}
