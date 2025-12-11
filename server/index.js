@@ -13,6 +13,7 @@ const bookingRoutes = require("./routes/bookingRoutes");
 const venueRoutes = require("./routes/venueRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const goodiesRoutes = require("./routes/goodiesRoutes");
 
 const app = express();
 
@@ -180,6 +181,7 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/venues", venueRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/goodies", goodiesRoutes);
 
 if(process.env.NODE_ENV === 'production'){
   app.use(express.static(path.join(__dirname, "../client/build")));

@@ -31,6 +31,11 @@ try {
       fetch: async () => {
         throw new Error("Razorpay client not available. Install the 'razorpay' package and set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET environment variables.");
       }
+    },
+    orders: {
+      create: async () => {
+        throw new Error("Razorpay client not available. Install the 'razorpay' package and set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET environment variables.");
+      }
     }
   };
 }

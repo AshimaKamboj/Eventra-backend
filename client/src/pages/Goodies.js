@@ -60,6 +60,9 @@ function Goodies() {
     zip: "",
     country: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
 
   const addToCart = (item) => {
     setCart((prev) => ({ ...prev, [item.id]: (prev[item.id] || 0) + 1 }));
@@ -83,7 +86,18 @@ function Goodies() {
 
   const total = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
 
-  const handleCheckout = () => {
+  const loadRazorpay = () => {
+    if (window.Razorpay) return Promise.resolve(true);
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => reject(new Error("Failed to load Razorpay SDK"));
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleCheckout = async () => {
     if (!cartItems.length) return;
     const required = ["name", "email", "phone", "address", "city", "zip", "country"];
     const missing = required.filter((k) => !shipping[k]?.trim());
@@ -92,12 +106,68 @@ function Goodies() {
       return;
     }
 
-    // Placeholder for Razorpay order creation; keeping client-side only for now
-    alert(
-      `Checkout coming soon.\nName: ${shipping.name}\nEmail: ${shipping.email}\nPhone: ${shipping.phone}\nAddress: ${shipping.address}, ${shipping.city} ${shipping.zip}, ${shipping.country}\nItems: ${cartItems
-        .map((i) => `${i.name} x ${i.qty}`)
-        .join(", ")}\nTotal: $${total.toFixed(2)}`
-    );
+    setError("");
+    setStatus("Creating order...");
+    setLoading(true);
+
+    try {
+      await loadRazorpay();
+
+      const res = await fetch("/api/goodies/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cartItems: cartItems.map((item) => ({ id: item.id, name: item.name, price: item.price, qty: item.qty })),
+          shipping,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.message || "Unable to create order");
+      }
+
+      const options = {
+        key: data.key,
+        amount: data.amount,
+        currency: data.currency,
+        name: "Eventra Goodies",
+        description: "Merch order",
+        order_id: data.orderId,
+        prefill: {
+          name: shipping.name,
+          email: shipping.email,
+          contact: shipping.phone,
+        },
+        notes: {
+          shipping_address: `${shipping.address}, ${shipping.city} ${shipping.zip}, ${shipping.country}`,
+        },
+        handler: (response) => {
+          setStatus("Payment successful. Thank you!");
+          setCart({});
+          setShipping({
+            name: "",
+            email: "",
+            phone: "",
+            address: "",
+            city: "",
+            zip: "",
+            country: "",
+          });
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", (resp) => {
+        setError(resp.error?.description || "Payment failed");
+      });
+      rzp.open();
+      setStatus("Razorpay ready — complete payment in the popup.");
+    } catch (err) {
+      setError(err?.message || "Checkout failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -183,6 +253,9 @@ function Goodies() {
             <span>${total.toFixed(2)}</span>
           </div>
 
+          {error && <p style={{ color: "#dc2626", margin: "0.35rem 0" }}>{error}</p>}
+          {status && <p style={{ color: "#16a34a", margin: "0.35rem 0" }}>{status}</p>}
+
           <div style={{ margin: "1rem 0 0.5rem", fontWeight: 600 }}>Delivery address</div>
           <div style={{ display: "grid", gap: "0.65rem" }}>
             <input
@@ -233,10 +306,10 @@ function Goodies() {
 
           <button
             className="goodies-checkout"
-            disabled={!cartItems.length}
+            disabled={!cartItems.length || loading}
             onClick={handleCheckout}
           >
-            Proceed to checkout (Razorpay next)
+            {loading ? "Processing..." : "Proceed to checkout"}
           </button>
         </div>
       </div>
