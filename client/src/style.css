@@ -1,3 +1,209 @@
+
+/* =============================
+   Goodies Merch Page Styles
+ ============================= */
+.goodies-page {
+  padding: 2rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.goodies-kicker {
+  color: #6366f1;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.goodies-title {
+  font-size: 2rem;
+  margin: 0 0 0.5rem;
+  color: #111827;
+}
+
+.goodies-subtitle {
+  color: #4b5563;
+  max-width: 720px;
+  margin: 0 0 1.25rem;
+  line-height: 1.6;
+}
+
+.goodies-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.goodies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.goodies-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.goodies-img-wrap {
+  position: relative;
+  padding-bottom: 65%;
+  overflow: hidden;
+}
+
+.goodies-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.goodies-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #111827;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.goodies-card-body {
+  padding: 1rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.goodies-name {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  color: #111827;
+}
+
+.goodies-desc {
+  margin: 0 0 0.5rem;
+  color: #6b7280;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.goodies-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.goodies-price {
+  font-weight: 700;
+  color: #111827;
+}
+
+.goodies-add-btn {
+  background: linear-gradient(120deg, #6366f1, #8b5cf6);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.35);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.goodies-add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.35);
+}
+
+.goodies-summary {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.goodies-summary h3 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.goodies-cart-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.goodies-cart-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.goodies-qty-btn {
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 6px;
+  padding: 0.25rem 0.55rem;
+  cursor: pointer;
+}
+
+.goodies-total {
+  border-top: 1px solid #e5e7eb;
+  margin: 1rem 0;
+  padding-top: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  color: #111827;
+}
+
+.goodies-checkout {
+  width: 100%;
+  background: linear-gradient(120deg, #10b981, #059669);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  box-shadow: 0 8px 18px rgba(16, 185, 129, 0.3);
+}
+
+.goodies-checkout:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.goodies-checkout:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(16, 185, 129, 0.35);
+}
+
+@media (max-width: 900px) {
+  .goodies-layout {
+    grid-template-columns: 1fr;
+  }
+}
 /* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 

@@ -15,6 +15,7 @@ import CreateVenue from "./pages/CreateVenue"; // original
 import CreateVenueNew from "./pages/CreateVenueNew"; // new form page
 import EditVenue from "./pages/EditVenue"; // <-- newly added
 import Venues from "./pages/Venues";
+import Goodies from "./pages/Goodies";
 import Blog from "./pages/Blog";
 import Support from "./pages/Support";
 import Login from "./pages/Login";
@@ -52,6 +53,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/explore" element={<Explore />} />
+          <Route path="/goodies" element={<Goodies />} />
           <Route path="/venues" element={<Venues />} />
           <Route path="/venues/:id" element={<VenueDetails />} />
           <Route path="/blog" element={<Blog />} />

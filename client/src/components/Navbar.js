@@ -28,6 +28,8 @@ function Navbar() {
       <div className="nav-center">
         <Link to="/explore">Explore</Link>
 
+        <Link to="/goodies">Goodies</Link>
+
         {/* ✅ Only organizers see Create Event and Venues */}
         {auth?.user?.role === "organizer" && (
           <>
