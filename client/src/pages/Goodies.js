@@ -51,6 +51,15 @@ const GOODS = [
 
 function Goodies() {
   const [cart, setCart] = useState({});
+  const [shipping, setShipping] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    zip: "",
+    country: "",
+  });
 
   const addToCart = (item) => {
     setCart((prev) => ({ ...prev, [item.id]: (prev[item.id] || 0) + 1 }));
@@ -74,52 +83,58 @@ function Goodies() {
 
   const total = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
 
+  const handleCheckout = () => {
+    if (!cartItems.length) return;
+    const required = ["name", "email", "phone", "address", "city", "zip", "country"];
+    const missing = required.filter((k) => !shipping[k]?.trim());
+    if (missing.length) {
+      alert("Please fill all shipping fields before checkout.");
+      return;
+    }
+
+    // Placeholder for Razorpay order creation; keeping client-side only for now
+    alert(
+      `Checkout coming soon.\nName: ${shipping.name}\nEmail: ${shipping.email}\nPhone: ${shipping.phone}\nAddress: ${shipping.address}, ${shipping.city} ${shipping.zip}, ${shipping.country}\nItems: ${cartItems
+        .map((i) => `${i.name} x ${i.qty}`)
+        .join(", ")}\nTotal: $${total.toFixed(2)}`
+    );
+  };
+
   return (
-    <div style={{ padding: "2rem 1.5rem", maxWidth: "1200px", margin: "0 auto" }}>
+    <div className="goodies-page">
       <header style={{ marginBottom: "1rem" }}>
-        <p style={{ color: "#6366f1", fontWeight: 700, letterSpacing: "0.08em", fontSize: "0.85rem", textTransform: "uppercase" }}>
-          Merch Store
-        </p>
-        <h1 style={{ fontSize: "2rem", margin: "0 0 0.5rem" }}>Eventra Goodies</h1>
-        <p style={{ color: "#4b5563", maxWidth: "720px" }}>
-          Grab limited Eventra tees, caps, bags, stickers, and more. Add items to your bag and proceed to checkout (coming soon!).
+        <p className="goodies-kicker">Merch Store</p>
+        <h1 className="goodies-title">Eventra Goodies</h1>
+        <p className="goodies-subtitle">
+          Grab limited Eventra tees, caps, bags, stickers, and more. Add items to your bag and proceed to checkout. We collect your delivery details and will wire Razorpay checkout next.
         </p>
       </header>
 
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1.5rem" }}>
+      <div className="goodies-layout">
         {/* Products grid */}
-        <div className="goodies-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1rem" }}>
+        <div className="goodies-grid">
           {GOODS.map((item) => (
-            <div key={item.id} style={{ border: "1px solid #e5e7eb", borderRadius: "12px", overflow: "hidden", background: "#fff", display: "flex", flexDirection: "column", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
-              <div style={{ position: "relative", paddingBottom: "65%", overflow: "hidden" }}>
+            <div key={item.id} className="goodies-card">
+              <div className="goodies-img-wrap">
                 <img
                   src={item.image}
                   alt={item.name}
-                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                  className="goodies-img"
                 />
                 {item.badge && (
-                  <span style={{ position: "absolute", top: 12, left: 12, background: "#111827", color: "#fff", padding: "4px 10px", borderRadius: "999px", fontSize: "0.75rem", letterSpacing: "0.04em" }}>
+                  <span className="goodies-badge">
                     {item.badge}
                   </span>
                 )}
               </div>
-              <div style={{ padding: "1rem", flexGrow: 1, display: "flex", flexDirection: "column" }}>
-                <h3 style={{ margin: "0 0 0.35rem", fontSize: "1.05rem" }}>{item.name}</h3>
-                <p style={{ margin: "0 0 0.5rem", color: "#6b7280", fontSize: "0.95rem" }}>{item.description}</p>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto" }}>
-                  <span style={{ fontWeight: 700, color: "#111827" }}>${item.price.toFixed(2)}</span>
+              <div className="goodies-card-body">
+                <h3 className="goodies-name">{item.name}</h3>
+                <p className="goodies-desc">{item.description}</p>
+                <div className="goodies-price-row">
+                  <span className="goodies-price">${item.price.toFixed(2)}</span>
                   <button
                     onClick={() => addToCart(item)}
-                    style={{
-                      background: "linear-gradient(120deg, #6366f1, #8b5cf6)",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "8px",
-                      padding: "0.5rem 0.9rem",
-                      cursor: "pointer",
-                      fontWeight: 600,
-                      boxShadow: "0 4px 10px rgba(99,102,241,0.35)",
-                    }}
+                    className="goodies-add-btn"
                   >
                     Add to bag
                   </button>
@@ -129,15 +144,15 @@ function Goodies() {
           ))}
         </div>
 
-        {/* Cart summary */}
-        <div style={{ border: "1px solid #e5e7eb", borderRadius: "12px", padding: "1.25rem", background: "#fff", boxShadow: "0 8px 20px rgba(0,0,0,0.06)" }}>
-          <h3 style={{ marginTop: 0, marginBottom: "0.75rem", fontSize: "1.1rem" }}>Your bag</h3>
+        {/* Cart + shipping summary */}
+        <div className="goodies-summary">
+          <h3>Your bag</h3>
           {cartItems.length === 0 ? (
             <p style={{ color: "#6b7280" }}>Add goodies to see them here.</p>
           ) : (
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: "0.75rem" }}>
+            <ul className="goodies-cart-list">
               {cartItems.map((item) => (
-                <li key={item.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <li key={item.id} className="goodies-cart-row">
                   <div>
                     <div style={{ fontWeight: 600 }}>{item.name}</div>
                     <div style={{ color: "#6b7280", fontSize: "0.9rem" }}>
@@ -147,13 +162,13 @@ function Goodies() {
                   <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                     <button
                       onClick={() => removeFromCart(item.id)}
-                      style={{ border: "1px solid #e5e7eb", background: "#f9fafb", borderRadius: "6px", padding: "0.25rem 0.55rem", cursor: "pointer" }}
+                      className="goodies-qty-btn"
                     >
                       −
                     </button>
                     <button
                       onClick={() => addToCart(item)}
-                      style={{ border: "1px solid #e5e7eb", background: "#f9fafb", borderRadius: "6px", padding: "0.25rem 0.55rem", cursor: "pointer" }}
+                      className="goodies-qty-btn"
                     >
                       +
                     </button>
@@ -163,31 +178,65 @@ function Goodies() {
             </ul>
           )}
 
-          <div style={{ borderTop: "1px solid #e5e7eb", margin: "1rem 0", paddingTop: "0.75rem", display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
+          <div className="goodies-total">
             <span>Total</span>
             <span>${total.toFixed(2)}</span>
           </div>
 
+          <div style={{ margin: "1rem 0 0.5rem", fontWeight: 600 }}>Delivery address</div>
+          <div style={{ display: "grid", gap: "0.65rem" }}>
+            <input
+              placeholder="Full name"
+              value={shipping.name}
+              onChange={(e) => setShipping({ ...shipping, name: e.target.value })}
+              className="goodies-input"
+            />
+            <input
+              placeholder="Email"
+              value={shipping.email}
+              onChange={(e) => setShipping({ ...shipping, email: e.target.value })}
+              className="goodies-input"
+            />
+            <input
+              placeholder="Phone"
+              value={shipping.phone}
+              onChange={(e) => setShipping({ ...shipping, phone: e.target.value })}
+              className="goodies-input"
+            />
+            <input
+              placeholder="Street address"
+              value={shipping.address}
+              onChange={(e) => setShipping({ ...shipping, address: e.target.value })}
+              className="goodies-input"
+            />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.65rem" }}>
+              <input
+                placeholder="City"
+                value={shipping.city}
+                onChange={(e) => setShipping({ ...shipping, city: e.target.value })}
+                className="goodies-input"
+              />
+              <input
+                placeholder="ZIP / Postal"
+                value={shipping.zip}
+                onChange={(e) => setShipping({ ...shipping, zip: e.target.value })}
+                className="goodies-input"
+              />
+            </div>
+            <input
+              placeholder="Country"
+              value={shipping.country}
+              onChange={(e) => setShipping({ ...shipping, country: e.target.value })}
+              className="goodies-input"
+            />
+          </div>
+
           <button
-            style={{
-              width: "100%",
-              background: cartItems.length ? "linear-gradient(120deg, #10b981, #059669)" : "#e5e7eb",
-              color: cartItems.length ? "#fff" : "#9ca3af",
-              border: "none",
-              borderRadius: "10px",
-              padding: "0.75rem",
-              fontWeight: 700,
-              cursor: cartItems.length ? "pointer" : "not-allowed",
-              transition: "transform 120ms ease, box-shadow 120ms ease",
-              boxShadow: cartItems.length ? "0 8px 18px rgba(16,185,129,0.3)" : "none",
-            }}
+            className="goodies-checkout"
             disabled={!cartItems.length}
-            onClick={() => {
-              if (!cartItems.length) return;
-              alert("Checkout coming soon! Your selections are saved locally.");
-            }}
+            onClick={handleCheckout}
           >
-            Checkout (coming soon)
+            Proceed to checkout (Razorpay next)
           </button>
         </div>
       </div>

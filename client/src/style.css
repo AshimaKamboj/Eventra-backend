@@ -199,6 +199,21 @@
   box-shadow: 0 12px 22px rgba(16, 185, 129, 0.35);
 }
 
+.goodies-input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 0.95rem;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.goodies-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
 @media (max-width: 900px) {
   .goodies-layout {
     grid-template-columns: 1fr;
