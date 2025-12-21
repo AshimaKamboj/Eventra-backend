@@ -135,7 +135,7 @@ const sampleEvents = [
   }
 ];
 
-// const __dirname = path.resolve();
+const __dirname = path.resolve();
 
 // Middleware
 app.use(cors({
