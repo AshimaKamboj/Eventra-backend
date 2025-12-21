@@ -3542,7 +3542,7 @@ textarea:focus {
   }
 }
 
-/* Search bar refinement
+/* 
 .event-filter {
   display: flex;
   justify-content: center;
@@ -3759,248 +3759,118 @@ textarea:focus {
   }
 } */
 
-/* ==============================
-   EVENT DETAILS – COLORFUL UI
-   ============================== */
+/* ================= EVENT DETAILS ================= */
 
 .event-details {
   display: flex;
-  gap: 36px;
+  gap: 40px;
   max-width: 1200px;
   margin: 40px auto;
   padding: 0 20px;
-  background: linear-gradient(180deg, #f9f7ff, #fefcff);
+  background: linear-gradient(180deg, #f9f7ff, #ffffff);
 }
 
-/* ---------- Banner ---------- */
+/* LEFT IMAGE COLUMN */
 .event-banner-container {
   flex: 1;
-  max-width: 420px;
-  position: sticky;
-  top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .event-banner {
-  width: 100%;
-  height: 420px;
-  object-fit: cover;
-  border-radius: 22px;
-  box-shadow: 0 18px 40px rgba(138, 43, 226, 0.25);
-  transition: transform 0.5s ease;
+  background-size: cover;
+  background-position: center;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(138, 43, 226, 0.25);
+  transition: transform 0.4s ease;
 }
 
 .event-banner:hover {
   transform: scale(1.03);
 }
 
-/* ---------- Right Content ---------- */
+.main-banner {
+  height: 300px;
+}
+
+.extra-banners {
+  display: flex;
+  gap: 14px;
+}
+
+.small-banner {
+  height: 140px;
+  flex: 1;
+}
+
+/* RIGHT CONTENT */
 .event-content {
   flex: 2;
 }
 
 .event-card-large {
-  background: linear-gradient(135deg, #ffffff, #fbf8ff);
+  background: #ffffff;
   border-radius: 24px;
   padding: 36px;
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.1);
-  animation: fadeUp 0.6s ease;
+  box-shadow: 0 16px 45px rgba(0,0,0,0.1);
 }
 
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ---------- Header ---------- */
 .event-title {
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 800;
   background: linear-gradient(90deg, #8a2be2, #ff5fa2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.event-meta {
+.event-meta,
+.event-attendees {
   font-size: 14px;
-  margin-top: 6px;
   color: #666;
 }
 
-.event-attendees {
-  font-size: 14px;
-  margin-bottom: 24px;
-  color: #777;
-}
-
-/* ---------- Sections ---------- */
 .event-section {
-  margin-top: 34px;
+  margin-top: 30px;
 }
 
 .event-section h2 {
-  font-size: 19px;
-  font-weight: 700;
-  margin-bottom: 10px;
+  font-size: 18px;
   color: #4b2aad;
 }
 
-.event-section p {
-  color: #555;
-  line-height: 1.7;
-}
-
-/* ---------- Map ---------- */
-.event-section iframe,
-.map-container {
-  margin-top: 12px;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-}
-
-/* ---------- Tickets ---------- */
 .ticket-list {
   list-style: none;
   padding: 0;
-  margin: 0;
 }
 
 .ticket-item {
   background: linear-gradient(135deg, #fdf2ff, #eef3ff);
-  border-radius: 18px;
-  padding: 18px 22px;
-  margin-bottom: 16px;
+  border-radius: 16px;
+  padding: 14px 18px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  transition: all 0.35s ease;
-  box-shadow: 0 10px 30px rgba(138, 43, 226, 0.12);
 }
 
-.ticket-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 45px rgba(138, 43, 226, 0.25);
-}
-
-.ticket-left {
-  font-weight: 700;
-  color: #333;
-}
-
-/* ---------- Quantity Input ---------- */
-.ticket-item input[type="number"] {
-  width: 72px;
-  padding: 7px 8px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-
-/* ---------- Buttons ---------- */
 .colorful-button {
   background: linear-gradient(135deg, #8a2be2, #ff5fa2);
-  color: #fff;
+  color: white;
   border: none;
-  padding: 9px 18px;
+  padding: 8px 16px;
   border-radius: 999px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.35s ease;
 }
 
-.colorful-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(255, 95, 162, 0.45);
-}
-
-/* ---------- QR Ticket ---------- */
-.ticket-preview {
-  margin-top: 34px;
-  padding: 22px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #eafff4, #f2fffb);
-  border: 1px solid #bdf3d6;
-  text-align: center;
-  animation: fadeUp 0.6s ease;
-}
-
-.qr-img {
-  width: 190px;
-  margin-top: 12px;
-}
-
-/* ---------- Reviews ---------- */
-.reviews-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 45px;
-  padding-top: 25px;
-  border-top: 1px solid #eee;
-}
-
-.rating-display {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.rating-number {
-  font-size: 38px;
-  font-weight: 800;
-  color: #ffb703;
-}
-
-.review-count {
-  font-size: 14px;
-  color: #777;
-}
-
-/* ---------- Review Buttons ---------- */
-.btn-primary {
-  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-  color: #fff;
-  border: none;
-  padding: 9px 18px;
-  border-radius: 20px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.btn-outline {
-  background: transparent;
-  border: 2px solid #6c5ce7;
-  color: #6c5ce7;
-  padding: 8px 18px;
-  border-radius: 20px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-/* ---------- Popup ---------- */
-.popup {
-  animation: fadeUp 0.4s ease;
-}
-
-/* ---------- Responsive ---------- */
+/* RESPONSIVE */
 @media (max-width: 900px) {
   .event-details {
     flex-direction: column;
   }
 
-  .event-banner-container {
-    max-width: 100%;
-    position: static;
-  }
-
-  .event-banner {
-    height: 260px;
+  .extra-banners {
+    flex-direction: row;
   }
 }
