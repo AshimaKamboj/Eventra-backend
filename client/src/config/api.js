@@ -1,4 +1,10 @@
-const API_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:5000";
+import axios from "axios";
 
-export default API_URL;
+// Create an Axios instance
+const API = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
+  // You can add default headers here if needed
+  // headers: { "Content-Type": "application/json" }
+});
+
+export default API;
