@@ -1,8 +1,9 @@
 // client/src/pages/CreateVenue.js
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import MapLocationPicker from "../components/MapLocationPicker";
 import "../style.css";
 
 function CreateVenue() {
@@ -13,7 +14,8 @@ function CreateVenue() {
       address: "",
       city: "",
       state: "",
-      country: "India"
+      country: "India",
+      coordinates: { lat: 28.6139, lng: 77.209 }
     },
     capacity: {
       min: "",
@@ -37,6 +39,20 @@ function CreateVenue() {
   const { auth } = useAuth();
   const [venueCreated, setVenueCreated] = useState(false);
   const [createdVenue, setCreatedVenue] = useState(null);
+
+  const handleMapLocationSelect = useCallback(({ coordinates, address, city, state, country }) => {
+    setFormData((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        coordinates: coordinates || prev.location.coordinates,
+        address: address || prev.location.address,
+        city: city || prev.location.city,
+        state: state || prev.location.state,
+        country: country || prev.location.country,
+      },
+    }));
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -158,6 +174,11 @@ function CreateVenue() {
               <option value="UK">UK</option>
               <option value="Canada">Canada</option>
             </select>
+
+            <MapLocationPicker
+              initialLocation={formData.location.coordinates}
+              onLocationSelect={handleMapLocationSelect}
+            />
           </div>
 
           {/* Capacity */}

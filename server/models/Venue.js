@@ -8,7 +8,11 @@ const VenueSchema = new mongoose.Schema({
     address: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, default: '' },
-    country: { type: String, default: 'India' }
+    country: { type: String, default: 'India' },
+    coordinates: {
+      lat: { type: Number },
+      lng: { type: Number }
+    }
   },
   capacity: { 
     min: { type: Number, required: true },

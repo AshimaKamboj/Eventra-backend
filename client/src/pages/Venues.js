@@ -218,7 +218,7 @@ function Venues() {
         <div style={{ textAlign: "center", marginTop: "2rem" }}>
           <button
             className="btn-primary"
-            onClick={() => navigate("/venues/create")}
+            onClick={() => navigate("/create-venue")}
             style={{
               padding: "0.65rem 1.25rem",
               borderRadius: "8px",

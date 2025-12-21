@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import ExploreMapView from "../components/ExploreMapView";
 import "../style.css";
 function Explore() {
   // Static/demo events
@@ -52,6 +53,7 @@ function Explore() {
 
   const [dbEvents, setDbEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'map'
   // placeholder state (no organizer controls on this page)
   // no organizer controls on this page
 
@@ -78,36 +80,57 @@ function Explore() {
     <section className="explore-page">
       <h1 className="section-title">Discover Events</h1>
 
-      <div className="event-filter">
-        <input type="text" placeholder="Search events..." />
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "20px", gap: "10px" }}>
+        <button
+          className={`btn ${viewMode === "grid" ? "btn-primary" : "btn-outline"}`}
+          onClick={() => setViewMode("grid")}
+        >
+          📊 Grid View
+        </button>
+        <button
+          className={`btn ${viewMode === "map" ? "btn-primary" : "btn-outline"}`}
+          onClick={() => setViewMode("map")}
+        >
+          🗺️ Map View
+        </button>
       </div>
 
-      <div className="events-grid">
-        {allEvents.map((event) => (
-          <div key={event._id || event.id} className="event-card">
-            <img src={event.image} alt={event.title} className="event-img" />
-            <div className="event-info">
-              <h3>{event.title}</h3>
-              <p>
-                📅{" "}
-                {event.date
-                  ? new Date(event.date).toLocaleDateString("en-US", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })
-                  : event.date}
-                {" • "}📍 {event.location?.city || event.location}
-              </p>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <Link to={`/event/${event._id || event.id}`}>
-                  <button className="event-btn">View Details</button>
-                </Link>
-              </div>
-            </div>
+      {viewMode === "grid" ? (
+        <>
+          <div className="event-filter">
+            <input type="text" placeholder="Search events..." />
           </div>
-        ))}
-      </div>
+
+          <div className="events-grid">
+            {allEvents.map((event) => (
+              <div key={event._id || event.id} className="event-card">
+                <img src={event.image} alt={event.title} className="event-img" />
+                <div className="event-info">
+                  <h3>{event.title}</h3>
+                  <p>
+                    📅{" "}
+                    {event.date
+                      ? new Date(event.date).toLocaleDateString("en-US", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : event.date}
+                    {" • "}📍 {event.location?.city || event.location}
+                  </p>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <Link to={`/event/${event._id || event.id}`}>
+                      <button className="event-btn">View Details</button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <ExploreMapView events={allEvents} />
+      )}
     </section>
   );
 }

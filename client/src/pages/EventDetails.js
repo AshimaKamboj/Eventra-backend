@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import ReviewList from "../components/ReviewList";
 import ReviewForm from "../components/ReviewForm";
 import StarRating from "../components/StarRating";
+import EventLocationMap from "../components/EventLocationMap";
 import "./../style.css";
 
 function EventDetails() {
@@ -134,6 +135,16 @@ function EventDetails() {
                 {event.location?.venue}, {event.location?.address},{" "}
                 {event.location?.city}
               </p>
+
+              {event.location?.coordinates?.lat && event.location?.coordinates?.lng && (
+                <EventLocationMap
+                  latitude={event.location.coordinates.lat}
+                  longitude={event.location.coordinates.lng}
+                  title={event.title}
+                  address={event.location.address}
+                  city={event.location.city}
+                />
+              )}
             </div>
 
             <div className="event-section">

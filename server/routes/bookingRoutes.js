@@ -62,7 +62,10 @@ router.post("/:eventId", protect, async (req, res) => {
     await booking.populate('event');
     await booking.populate('user');
 
-    // Generate QR Code with detailed booking data as JSON
+    // Generate QR Code with detailed booking data as JSON (includes verify URL for staff)
+    const serverIp = process.env.SERVER_IP || '192.168.113.198';
+    const verificationUrl = `http://${serverIp}:3001/api/bookings/verify/${booking._id}`;
+
     const qrData = {
       bookingId: booking._id.toString(),
       eventName: booking.event?.title || 'Event',
@@ -76,14 +79,17 @@ router.post("/:eventId", protect, async (req, res) => {
       city: booking.event?.location?.city || '',
       country: booking.event?.location?.country || ''
     };
-    
-    const qrDataString = JSON.stringify(qrData);
-    // Use IP address instead of localhost so mobile phones can access it
-    const serverIp = process.env.SERVER_IP || '192.168.113.198';
-    const verificationUrl = `http://${serverIp}:3001/api/bookings/verify/${booking._id}`;
-    
+
+    const qrPayload = {
+      type: 'eventra-ticket',
+      verifyUrl: verificationUrl,
+      ...qrData,
+    };
+
+    const qrDataString = JSON.stringify(qrPayload);
+
     const qrResponse = await fetch(
-      `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(verificationUrl)}`
+      `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrDataString)}`
     );
     const qrBuffer = await qrResponse.arrayBuffer();
     const qrBase64 = `data:image/png;base64,${Buffer.from(qrBuffer).toString("base64")}`;
