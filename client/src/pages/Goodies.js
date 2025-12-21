@@ -11,7 +11,7 @@ const GOODS = [
     description: "Soft cotton, unisex fit with Eventra wordmark.",
     badge: "Best Seller",
     image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
+      "https://www.houseofblanks.com/cdn/shop/files/HeavyweightTshirt_ChocolateBrown_01_1.jpg?v=1726511324&width=1946",
   },
   {
     id: "cap",
@@ -20,7 +20,7 @@ const GOODS = [
     description: "Low-profile cap with embroidered logo.",
     badge: "New",
     image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQB0sfjyDinOiFnTi6x5ulttXLxEdxABJ5ogg&s",
   },
   {
     id: "bag",
@@ -29,7 +29,7 @@ const GOODS = [
     description: "Durable canvas tote for events and daily use.",
     badge: "Eco",
     image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
+      "https://m.media-amazon.com/images/I/61rorcTqRLL._AC_UY1100_.jpg",
   },
   {
     id: "hoodie",
@@ -38,7 +38,7 @@ const GOODS = [
     description: "Mid-weight hoodie with front pocket.",
     badge: "Limited",
     image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
+      "https://m.media-amazon.com/images/I/71y-AWQfJ0L._AC_UY1100_.jpg",
   },
   {
     id: "stickers",
@@ -47,7 +47,7 @@ const GOODS = [
     description: "Die-cut stickers set of 6 designs.",
     badge: "Popular",
     image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
+      "https://i.etsystatic.com/24636413/r/il/70244a/3164639890/il_570xN.3164639890_k4ct.jpg",
   },
 ];
 
