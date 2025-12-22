@@ -1,7 +1,7 @@
 // src/pages/Signup.js
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import API from "../config/api";
 import { useAuth } from "../context/AuthContext";
 import "./../style.css";
 
@@ -30,7 +30,7 @@ function Signup() {
     }
 
     try {
-      const res = await axios.post("/api/auth/register", {
+      const res = await API.post("/api/auth/register", {
         name: form.name,
         email: form.email,
         password: form.password,
