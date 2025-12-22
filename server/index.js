@@ -100,6 +100,7 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const goodiesRoutes = require("./routes/goodiesRoutes");
 const supportRoutes = require("./routes/supportRoutes"); // ✅ ADD THIS
+const chatRoutes = require("./routes/chatRoutes");
 
 const app = express();
 
@@ -138,6 +139,7 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/goodies", goodiesRoutes);
 app.use("/api/support", supportRoutes); // ✅ ADD THIS LINE
+app.use("/api/chat", chatRoutes);
 
 /* -------------------- Health Check -------------------- */
 app.get("/", (req, res) => {

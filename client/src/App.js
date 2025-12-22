@@ -3,6 +3,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ChatWidget from "./components/ChatWidget";
 import Hero from "./components/Hero";
 import Categories from "./components/Categories";
 import TrendingEvents from "./components/TrendingEvents";
@@ -49,6 +50,7 @@ function App() {
     <AuthProvider>
       <Router>
         <Navbar />
+        <ChatWidget />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
