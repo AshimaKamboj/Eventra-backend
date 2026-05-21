@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://eventra-backend-pr6v.onrender.com/api/$1"
+    }
+  ]
+}
