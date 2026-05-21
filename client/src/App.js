@@ -33,6 +33,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import OrganizerRoute from "./components/OrganizerRoute";
 import { AuthProvider } from "./context/AuthContext";
 
+console.log("force rebuild 2026 fix");
 // Home Page Layout
 function Home() {
   return (
