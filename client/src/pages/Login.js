@@ -1,7 +1,8 @@
 // src/pages/Login.js
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
+import API from "../config/api";
 import { useAuth } from "../context/AuthContext";
 import "./../style.css";
 
@@ -17,10 +18,10 @@ function Login() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("/api/auth/login", {
-        email: form.email,
-        password: form.password,
-      });
+      const res = await API.post("/auth/login", {
+  email: form.email,
+  password: form.password,
+});
 
       // ✅ Pass token + user separately
       login(res.data.token, res.data.user);

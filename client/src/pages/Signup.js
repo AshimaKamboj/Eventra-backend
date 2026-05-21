@@ -30,12 +30,12 @@ function Signup() {
     }
 
     try {
-      const res = await API.post("/api/auth/register", {
-        name: form.name,
-        email: form.email,
-        password: form.password,
-        role: form.role,
-      });
+      const res = await API.post("/auth/register", {
+  name: form.name,
+  email: form.email,
+  password: form.password,
+  role: form.role,
+});
 
       // ✅ Auto-login after signup (fix: pass token, user separately)
       login(res.data.token, res.data.user);
